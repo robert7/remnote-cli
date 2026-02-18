@@ -11,6 +11,10 @@ Useful e.g. for integration with OpenClaw agents, scripting and other automation
 > This is a working **proof-of-concept/experimental solution**. You're invited to test
 > it and [report any bugs or issues](https://github.com/robert7/remnote-cli/issues).
 
+## Demo
+
+See CLI flow and troubleshooting in action: **[View Demo →](docs/demo.md)**
+
 ## Architecture
 
 ```
@@ -57,6 +61,7 @@ remnote-cli daemon stop
 
 - **[Installation Guide](docs/guides/installation.md)** - Prerequisites and install methods
 - **[Daemon Management](docs/guides/daemon-management.md)** - Start, stop, status, logs, and PID behavior
+- **[Demo & Screenshots](docs/demo.md)** - Terminal walkthrough of daemon startup, connection checks, and search
 
 ### Usage
 

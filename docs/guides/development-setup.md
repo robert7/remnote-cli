@@ -11,7 +11,8 @@ source ./node-check.sh && npm install
 ## Development Commands
 
 ```bash
-npm run dev              # Watch mode (tsx)
+npm run dev              # Run CLI once via tsx (no watch)
+npm run dev:watch        # Watch mode (tsx)
 npm run build            # Compile TypeScript
 npm run typecheck        # Type check without emitting
 npm test                 # Run unit tests
