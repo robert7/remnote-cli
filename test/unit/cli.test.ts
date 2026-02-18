@@ -15,7 +15,7 @@ describe('createProgram', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const program = createProgram('0.1.0');
 
-    program.parse(['node', 'remnote-cli'], { from: 'user' });
+    program.parse([], { from: 'user' });
 
     expect(logSpy).toHaveBeenCalledWith(HELLO_MESSAGE);
   });
