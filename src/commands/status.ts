@@ -13,7 +13,7 @@ export function registerStatusCommand(program: Command): void {
       const client = new DaemonClient(parseInt(globalOpts.controlPort, 10));
 
       try {
-        const result = await client.execute('getStatus', {});
+        const result = await client.execute('get_status', {});
         console.log(
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;

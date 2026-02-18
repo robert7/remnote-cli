@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file.
 - Updated `AGENTS.md` to reflect current daemon-based architecture and implemented command/test scope.
 - Updated integration tests to require a pre-running daemon (no test-managed daemon start/stop lifecycle).
 - Updated integration testing guide to document external daemon prerequisite and revised workflow order.
+- Fixed CLI `status` bridge action name to `get_status` for compatibility with current RemNote Bridge plugin.
+- Added unit coverage to prevent regressions in status action dispatch.
 
 ## [0.1.0] - 2026-02-18
 
