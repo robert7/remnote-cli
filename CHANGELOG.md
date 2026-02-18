@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - Updated `AGENTS.md` companion-project references to sibling-relative `$(pwd)/../...` paths with short project-purpose notes.
 - Added terminology aliases in `AGENTS.md` to clarify project name equivalence (MCP server/bridge and companion naming).
 - Added status/license/CI/codecov badges at the top of `README.md` to align with companion repository conventions.
+- Updated README top description to use the current bridge name and link to `remnote-mcp-bridge`.
 
 ## [0.1.0] - 2026-02-18
 
