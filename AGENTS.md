@@ -4,21 +4,23 @@ This file provides guidance to AI agents when working with code in this reposito
 
 ## Project Overview
 
-This is a CLI companion app for the RemNote Bridge plugin. It will connect to the bridge via WebSocket and provide a
-command-line interface for agentic workflows (for example OpenClaw integrations).
+This is a CLI companion app for the RemNote Bridge plugin. It provides a daemon-backed command-line interface for
+agentic workflows (for example OpenClaw integrations), with JSON-first output for machine consumers.
 
-**Architecture target:**
+**Current architecture:**
 
 ```text
-CLI (this repo) ↔ WebSocket :3002 ↔ RemNote Bridge Plugin ↔ RemNote
+CLI commands (short-lived) ↔ HTTP Control API :3100 ↔ CLI daemon ↔ WebSocket :3002 ↔ RemNote Bridge Plugin ↔ RemNote
 ```
 
 ## Scope and Direction
 
 - This repository is the second companion app to `remnote-mcp-bridge`.
 - The first companion app is `remnote-mcp-server`.
-- Initial focus is packaging, release workflow, and CLI foundation.
-- Functional WebSocket command handling will be implemented in follow-up steps.
+- Core daemon lifecycle and bridge command flows are implemented (`create`, `search`, `read`, `update`, `journal`,
+  `status`, plus `daemon start|stop|status`).
+- Current focus is reliability, docs quality, and release workflow maturity.
+- Integration test workflows exist for live RemNote validation (`test/integration/` and `run-integration-test.sh`).
 
 ## MANDATORY: Code Change Requirements
 
@@ -71,8 +73,10 @@ npm run dev
 npm run build
 npm start
 npm run typecheck
+npm test
 npm run lint
 npm run format:check
+npm run test:integration
 ./code-quality.sh
 ```
 

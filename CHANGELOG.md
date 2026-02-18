@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 
 - Rewrote `src/cli.ts` from hello-world to full Commander.js program with subcommands and global options.
 - Updated `README.md` with a dedicated Documentation section that links all guides under `docs/guides/`.
+- Updated `AGENTS.md` to reflect current daemon-based architecture and implemented command/test scope.
 
 ## [0.1.0] - 2026-02-18
 
