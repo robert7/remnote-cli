@@ -19,11 +19,11 @@ export function registerUpdateCommand(program: Command): void {
       try {
         const payload: Record<string, unknown> = { remId };
         if (opts.title) payload.title = opts.title;
-        if (opts.append) payload.append = opts.append;
+        if (opts.append) payload.appendContent = opts.append;
         if (opts.addTags) payload.addTags = opts.addTags;
         if (opts.removeTags) payload.removeTags = opts.removeTags;
 
-        const result = await client.execute('updateNote', payload);
+        const result = await client.execute('update_note', payload);
         console.log(
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;

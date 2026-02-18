@@ -19,7 +19,7 @@ export function registerJournalCommand(program: Command): void {
           timestamp: opts.timestamp !== false,
         };
 
-        const result = await client.execute('appendJournal', payload);
+        const result = await client.execute('append_journal', payload);
         console.log(
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;

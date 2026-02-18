@@ -2,6 +2,24 @@
 
 This file provides guidance to AI agents when working with code in this repository.
 
+## CRITICAL: Companion Project Context
+
+When additional context is needed, agents SHOULD also inspect the two companion projects:
+
+- Resolve from this repo root (`$(pwd)`): companion repos are sibling directories at `$(pwd)/../...`.
+- `$(pwd)/../remnote-mcp-bridge` - RemNote plugin bridge layer; authoritative for WebSocket action names/payload
+  contracts used by this CLI.
+- `$(pwd)/../remnote-mcp-server` - MCP server companion; useful for shared bridge-contract usage patterns,
+  architecture, and troubleshooting flow.
+
+These repos define bridge action contracts and adjacent architecture decisions used by this CLI.
+
+Terminology aliases used across docs and discussions:
+
+- `remnote-mcp-server` = "MCP server" (same project)
+- `remnote-mcp-bridge` = "MCP bridge" or "bridge plugin" (same project)
+- `remnote-cli` = "CLI companion app" (this repository)
+
 ## Project Overview
 
 This is a CLI companion app for the RemNote Bridge plugin. It provides a daemon-backed command-line interface for
@@ -33,6 +51,15 @@ ALL code changes MUST follow these requirements:
 5. CHANGELOG.md - document functional and documentation changes
 
 See `.agents/dev-requirements.md` for detailed planning and execution guidelines.
+
+## CRITICAL: Integration Test Execution Policy
+
+AI agents MUST NOT run integration tests in this repository.
+
+- Do not run `./run-integration-test.sh`
+- Do not run `npm run test:integration`
+- Do run unit/static checks (`typecheck`, `lint`, unit tests) as needed
+- Ask the human collaborator to run integration tests and share logs when integration verification is required
 
 ## MANDATORY: Documentation Change Requirements
 

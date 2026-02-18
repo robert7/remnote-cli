@@ -19,7 +19,7 @@ export function registerReadCommand(program: Command): void {
           depth: parseInt(opts.depth, 10),
         };
 
-        const result = await client.execute('readNote', payload);
+        const result = await client.execute('read_note', payload);
         console.log(
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;

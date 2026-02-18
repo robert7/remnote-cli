@@ -21,7 +21,7 @@ export function registerCreateCommand(program: Command): void {
         if (opts.parentId) payload.parentId = opts.parentId;
         if (opts.tags) payload.tags = opts.tags;
 
-        const result = await client.execute('createNote', payload);
+        const result = await client.execute('create_note', payload);
         console.log(
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;

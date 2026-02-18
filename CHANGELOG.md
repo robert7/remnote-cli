@@ -36,6 +36,12 @@ All notable changes to this project will be documented in this file.
 - Updated integration testing guide to document external daemon prerequisite and revised workflow order.
 - Fixed CLI `status` bridge action name to `get_status` for compatibility with current RemNote Bridge plugin.
 - Added unit coverage to prevent regressions in status action dispatch.
+- Fixed CLI bridge action mappings for `create`, `read`, `update`, and `journal` to use bridge-compatible snake_case names.
+- Fixed `update` payload mapping to send `appendContent` for `--append`.
+- Added unit coverage for command-to-bridge action and payload mapping.
+- Updated `AGENTS.md` with a no-AI-integration-test policy and prominent companion-project context paths.
+- Updated `AGENTS.md` companion-project references to sibling-relative `$(pwd)/../...` paths with short project-purpose notes.
+- Added terminology aliases in `AGENTS.md` to clarify project name equivalence (MCP server/bridge and companion naming).
 
 ## [0.1.0] - 2026-02-18
 
