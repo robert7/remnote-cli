@@ -7,7 +7,8 @@ real content in RemNote, prefixed with `[CLI-TEST]` for easy cleanup.
 
 1. RemNote desktop app running
 2. Bridge plugin installed and enabled in RemNote
-3. Project built: `npm run build`
+3. CLI daemon already running (for example: `./run-daemon-in-foreground.sh`)
+4. Project built: `npm run build`
 
 ## Running Tests
 
@@ -36,14 +37,13 @@ npm run test:integration -- --yes
 
 ## Test Workflows
 
-1. **Daemon Lifecycle** — start, status, stop (self-contained)
-2. **Status Check** — bridge connection verification (gatekeeper)
-3. **Create & Search** — create notes, search for them
-4. **Read & Update** — read and modify created notes
-5. **Journal** — append journal entries
-6. **Error Cases** — invalid IDs, graceful error handling
+1. **Status Check** — bridge connection verification (gatekeeper)
+2. **Create & Search** — create notes, search for them
+3. **Read & Update** — read and modify created notes
+4. **Journal** — append journal entries
+5. **Error Cases** — invalid IDs, graceful error handling
 
-If the status check (workflow 2) fails, workflows 3-6 are skipped.
+If the status check (workflow 1) fails, workflows 2-5 are skipped.
 
 ## Cleanup
 

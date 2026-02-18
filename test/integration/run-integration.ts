@@ -15,7 +15,6 @@
 
 import * as readline from 'node:readline';
 import { CliTestClient } from './cli-test-client.js';
-import { daemonLifecycleWorkflow } from './workflows/01-daemon-lifecycle.js';
 import { statusWorkflow } from './workflows/02-status.js';
 import { createSearchWorkflow } from './workflows/03-create-search.js';
 import { readUpdateWorkflow } from './workflows/04-read-update.js';
@@ -120,26 +119,15 @@ async function main(): Promise<void> {
   const state: SharedState = {};
   const overallStart = Date.now();
 
-  // Workflow 1: Daemon lifecycle (self-contained, starts/stops its own daemon)
-  {
-    const result = await daemonLifecycleWorkflow({ cli, runId }, state);
-    results.push(result);
-    printWorkflowResult(0, result);
-  }
-
-  // For remaining workflows, we need a running daemon + bridge connection
-  // Start daemon for workflows 2-6
-  console.log(`\n${BOLD}Starting daemon for bridge-dependent workflows...${RESET}`);
-  const startResult = await cli.run(['daemon', 'start']);
-  if (startResult.exitCode !== 0) {
-    console.error(
-      `${RED}Failed to start daemon: ${startResult.stderr || startResult.stdout}${RESET}`
-    );
-    console.error(`\nMake sure RemNote and the bridge plugin are running.`);
+  // Preflight: integration tests require an already running daemon.
+  const daemonStatus = await cli.run(['daemon', 'status']);
+  if (daemonStatus.exitCode !== 0) {
+    console.error(`${RED}Daemon is not running on control port ${controlPort}.${RESET}`);
+    console.error(`Start it first, for example: ./run-daemon-in-foreground.sh`);
     process.exit(1);
   }
 
-  // Define remaining workflow sequence
+  // Define workflow sequence
   const workflows: Array<{ name: string; fn: WorkflowFn }> = [
     { name: 'Status Check', fn: statusWorkflow },
     { name: 'Create & Search', fn: createSearchWorkflow },
@@ -148,54 +136,31 @@ async function main(): Promise<void> {
     { name: 'Error Cases', fn: errorCasesWorkflow },
   ];
 
-  try {
-    for (let i = 0; i < workflows.length; i++) {
-      const workflow = workflows[i];
+  for (let i = 0; i < workflows.length; i++) {
+    const workflow = workflows[i];
 
-      // If status check failed, skip remaining workflows
-      if (i === 1 && results[1] && results[1].steps.some((s) => !s.passed)) {
-        const skippedResult: WorkflowResult = {
-          name: workflow.name,
-          steps: [
-            {
-              label: 'Skipped — status check failed',
-              passed: false,
-              durationMs: 0,
-              error: 'Prerequisite workflow 02 (Status Check) failed',
-            },
-          ],
-          skipped: true,
-        };
-        results.push(skippedResult);
-        printWorkflowResult(i + 1, skippedResult);
-        // Skip all remaining
-        for (let j = i + 1; j < workflows.length; j++) {
-          const skipped: WorkflowResult = {
-            name: workflows[j].name,
-            steps: [
-              {
-                label: 'Skipped — status check failed',
-                passed: false,
-                durationMs: 0,
-                error: 'Prerequisite workflow 02 (Status Check) failed',
-              },
-            ],
-            skipped: true,
-          };
-          results.push(skipped);
-          printWorkflowResult(j + 1, skipped);
-        }
-        break;
-      }
-
-      const result = await workflow.fn({ cli, runId }, state);
-      results.push(result);
-      printWorkflowResult(i + 1, result);
+    // If status check failed, skip remaining workflows
+    if (i > 0 && results[0] && results[0].steps.some((s) => !s.passed)) {
+      const skippedResult: WorkflowResult = {
+        name: workflow.name,
+        steps: [
+          {
+            label: 'Skipped — status check failed',
+            passed: false,
+            durationMs: 0,
+            error: 'Prerequisite workflow 01 (Status Check) failed',
+          },
+        ],
+        skipped: true,
+      };
+      results.push(skippedResult);
+      printWorkflowResult(i, skippedResult);
+      continue;
     }
-  } finally {
-    // Stop daemon
-    console.log(`\n${DIM}Stopping daemon...${RESET}`);
-    await cli.run(['daemon', 'stop']);
+
+    const result = await workflow.fn({ cli, runId }, state);
+    results.push(result);
+    printWorkflowResult(i, result);
   }
 
   const totalDuration = Date.now() - overallStart;
