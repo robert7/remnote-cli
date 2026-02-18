@@ -3,6 +3,9 @@
 CLI companion for the RemNote Bridge plugin. Provides terminal access to your RemNote knowledge base through a
 lightweight daemon architecture.
 
+> This is a working **proof-of-concept/experimental solution**. You're invited to test
+> it and [report any bugs or issues](https://github.com/robert7/remnote-cli/issues).
+
 ## Architecture
 
 ```
@@ -42,6 +45,26 @@ remnote-cli search "My Note" --text
 # Stop the daemon
 remnote-cli daemon stop
 ```
+
+## Documentation
+
+### Getting Started
+
+- **[Installation Guide](docs/guides/installation.md)** - Prerequisites and install methods
+- **[Daemon Management](docs/guides/daemon-management.md)** - Start, stop, status, logs, and PID behavior
+
+### Usage
+
+- **[Command Reference](docs/guides/command-reference.md)** - All CLI commands and examples
+
+### Help & Advanced
+
+- **[Troubleshooting](docs/guides/troubleshooting.md)** - Common issues and fixes
+
+### Development
+
+- **[Development Setup](docs/guides/development-setup.md)** - Local setup, workflows, and quality checks
+- **[Integration Testing](docs/guides/integration-testing.md)** - End-to-end testing against live RemNote
 
 ## Commands
 

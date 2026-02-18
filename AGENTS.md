@@ -7,8 +7,6 @@ This file provides guidance to AI agents when working with code in this reposito
 This is a CLI companion app for the RemNote Bridge plugin. It will connect to the bridge via WebSocket and provide a
 command-line interface for agentic workflows (for example OpenClaw integrations).
 
-**Current status:** bootstrap phase with an initial publishable hello-world CLI.
-
 **Architecture target:**
 
 ```text

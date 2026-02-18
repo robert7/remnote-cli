@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Rewrote `src/cli.ts` from hello-world to full Commander.js program with subcommands and global options.
+- Updated `README.md` with a dedicated Documentation section that links all guides under `docs/guides/`.
 
 ## [0.1.0] - 2026-02-18
 
