@@ -1,5 +1,9 @@
 # remnote-cli
 
+![Status](https://img.shields.io/badge/status-beta-yellow) ![License](https://img.shields.io/badge/license-MIT-blue)
+![CI](https://github.com/robert7/remnote-cli/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/robert7/remnote-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/robert7/remnote-cli)
+
 CLI companion for the RemNote Bridge plugin. Provides terminal access to your RemNote knowledge base through a
 lightweight daemon architecture.
 
