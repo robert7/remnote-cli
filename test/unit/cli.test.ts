@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { Command } from 'commander';
-import { createProgram, HELLO_MESSAGE, runCli } from '../../src/cli.js';
+import { createProgram } from '../../src/cli.js';
 
 describe('createProgram', () => {
   it('creates a configured Command instance', () => {
@@ -11,22 +11,37 @@ describe('createProgram', () => {
     expect(program.description()).toContain('CLI companion');
   });
 
-  it('prints hello message when invoked with no args', () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  it('registers all expected subcommands', () => {
     const program = createProgram('0.1.0');
+    const commandNames = program.commands.map((c) => c.name());
 
-    program.parse([], { from: 'user' });
-
-    expect(logSpy).toHaveBeenCalledWith(HELLO_MESSAGE);
+    expect(commandNames).toContain('daemon');
+    expect(commandNames).toContain('create');
+    expect(commandNames).toContain('search');
+    expect(commandNames).toContain('read');
+    expect(commandNames).toContain('update');
+    expect(commandNames).toContain('journal');
+    expect(commandNames).toContain('status');
   });
-});
 
-describe('runCli', () => {
-  it('parses argv and executes default action', () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  it('has global --text and --json options', () => {
+    const program = createProgram('0.1.0');
+    const optionNames = program.options.map((o) => o.long);
 
-    runCli(['node', 'remnote-cli']);
+    expect(optionNames).toContain('--json');
+    expect(optionNames).toContain('--text');
+    expect(optionNames).toContain('--control-port');
+    expect(optionNames).toContain('--verbose');
+  });
 
-    expect(logSpy).toHaveBeenCalledWith(HELLO_MESSAGE);
+  it('daemon command has start, stop, status subcommands', () => {
+    const program = createProgram('0.1.0');
+    const daemonCmd = program.commands.find((c) => c.name() === 'daemon');
+    expect(daemonCmd).toBeDefined();
+
+    const subNames = daemonCmd!.commands.map((c) => c.name());
+    expect(subNames).toContain('start');
+    expect(subNames).toContain('stop');
+    expect(subNames).toContain('status');
   });
 });
