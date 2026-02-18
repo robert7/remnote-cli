@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-18
+
 ### Added
 
 - Daemon architecture: background process hosting WebSocket server (:3002) and HTTP control API (:3100).
