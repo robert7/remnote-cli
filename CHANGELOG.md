@@ -15,6 +15,10 @@ All notable changes to this project will be documented in this file.
   for explicit watch-mode development.
 - Updated development setup docs to reflect the new `dev` / `dev:watch` behavior split.
 - Updated `README.md` to link the new demo page near the top of the file and from the Documentation index.
+- Updated `docs/demo.md` with a new OpenClaw chat screenshot section showing `remnote-cli` status, search, and
+  summary-attempt workflow.
+- Updated `docs/demo.md` OpenClaw section with a concise limitation note that full REM + children reads are not yet
+  available and require bridge-side improvements in `remnote-mcp-bridge`.
 
 ## [0.2.0] - 2026-02-18
 
