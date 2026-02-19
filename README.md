@@ -8,8 +8,7 @@ CLI (command-line interface) companion for the [RemNote Bridge for MCP & OpenCla
 Provides terminal access to your RemNote knowledge base through a lightweight daemon architecture.
 Useful e.g. for integration with OpenClaw agents, scripting and other automation.
 
-> This is a working **proof-of-concept/experimental solution**. You're invited to test
-> it and [report any bugs or issues](https://github.com/robert7/remnote-cli/issues).
+> This is a working solution, but still experimental. If you run into any issues, please [report them here](https://github.com/robert7/remnote-cli/issues).
 
 ## Demo
 
