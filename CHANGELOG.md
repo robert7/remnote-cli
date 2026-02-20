@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Search results no longer include `preview` field (removed upstream in bridge plugin)
 - Updated npm development scripts so `npm run dev` runs the CLI once (no file watching) and added `npm run dev:watch`
   for explicit watch-mode development.
 - Updated development setup docs to reflect the new `dev` / `dev:watch` behavior split.
