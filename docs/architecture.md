@@ -2,7 +2,7 @@
 
 ## Why a Daemon?
 
-The RemNote Bridge plugin is a WebSocket **client** — it connects to a server at `ws://127.0.0.1:3002`. In the MCP
+The RemNote Automation Bridge plugin is a WebSocket **client** — it connects to a server at `ws://127.0.0.1:3002`. In the MCP
 integration path, the MCP server hosts that WebSocket server. For the CLI path, the CLI itself must host it.
 
 Running a WebSocket server in every short-lived CLI command would be impractical: the bridge would need to reconnect

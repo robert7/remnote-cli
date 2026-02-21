@@ -1,6 +1,6 @@
 # Demo
 
-Terminal demonstration of `remnote-cli` against a live RemNote + Bridge plugin setup.
+Terminal demonstration of `remnote-cli` against a live RemNote + RemNote Automation Bridge plugin setup.
 
 ## Example of OpenClaw Chat Workflow with `remnote-cli`
 
@@ -11,7 +11,7 @@ This screenshot shows OpenClaw driving `remnote-cli` from a WhatsApp chat: it ch
 agent-to-CLI orchestration, quick status verification, and transparent handling when note content is incomplete.
 
 Note: reading a full REM with complete children content is not available yet via the bridge. This needs improvement in
-[RemNote Bridge plugin](https://github.com/robert7/remnote-mcp-bridge).
+[RemNote Automation Bridge plugin](https://github.com/robert7/remnote-mcp-bridge).
 
 ## CLI Startup, Connection, and Search
 

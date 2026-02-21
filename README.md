@@ -4,7 +4,7 @@
 ![CI](https://github.com/robert7/remnote-cli/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/robert7/remnote-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/robert7/remnote-cli)
 
-CLI (command-line interface) companion for the [RemNote Bridge for MCP & OpenClaw](https://github.com/robert7/remnote-mcp-bridge) plugin.
+CLI (command-line interface) companion for the [RemNote Automation Bridge](https://github.com/robert7/remnote-mcp-bridge) plugin.
 Provides terminal access to your RemNote knowledge base through a lightweight daemon architecture.
 Useful e.g. for integration with OpenClaw agents, scripting and other automation.
 
@@ -17,7 +17,7 @@ See CLI flow and troubleshooting in action: **[View Demo →](docs/demo.md)**
 ## Architecture
 
 ```
-RemNote + Bridge Plugin (WebSocket client)
+RemNote + Automation Bridge Plugin (WebSocket client)
          │
          │ ws://127.0.0.1:3002
          ▼
@@ -30,7 +30,7 @@ CLI Commands (short-lived)
   e.g. remnote-cli create "My Note"
 ```
 
-Two components: the Bridge plugin connects to the CLI daemon's WebSocket server. CLI commands talk to the daemon
+Two components: the RemNote Automation Bridge plugin connects to the CLI daemon's WebSocket server. CLI commands talk to the daemon
 over a local HTTP control API.
 
 ## Quick Start
@@ -41,7 +41,7 @@ npm install -g remnote-cli
 # Start the daemon
 remnote-cli daemon start
 
-# Check connection (requires RemNote + Bridge plugin running)
+# Check connection (requires RemNote + RemNote Automation Bridge plugin running)
 remnote-cli status --text
 
 # Create a note
@@ -112,7 +112,7 @@ remnote-cli daemon stop
 ## Prerequisites
 
 - Node.js >= 18
-- RemNote desktop app with the [Bridge plugin](https://github.com/robert7/remnote-bridge) installed and enabled
+- RemNote desktop app with the [RemNote Automation Bridge plugin](https://github.com/robert7/remnote-mcp-bridge) installed and enabled
 
 ## Troubleshooting
 
@@ -120,7 +120,7 @@ remnote-cli daemon stop
 Another process is using port 3002 or 3100. Use `--ws-port` or `--control-port` to pick different ports.
 
 **"Bridge not connected" after daemon start:**
-The RemNote Bridge plugin needs to be running in RemNote. Open RemNote and ensure the plugin is enabled.
+The RemNote Automation Bridge plugin needs to be running in RemNote. Open RemNote and ensure the plugin is enabled.
 
 **Stale PID file:**
 If the daemon crashed, `daemon start` will detect the stale PID file and clean it up automatically.
@@ -128,7 +128,7 @@ If the daemon crashed, `daemon start` will detect the stale PID file and clean i
 ## Related Projects
 
 - [remnote-mcp-server](https://github.com/robert7/remnote-mcp-server) — MCP server integration path
-- [remnote-mcp-bridge](https://github.com/robert7/remnote-mcp-bridge) — RemNote Bridge plugin
+- [remnote-mcp-bridge](https://github.com/robert7/remnote-mcp-bridge) — RemNote Automation Bridge plugin
 
 ## License
 

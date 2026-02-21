@@ -19,7 +19,7 @@ remnote-cli status --control-port 4100
 
 **Checklist:**
 1. Is RemNote running?
-2. Is the Bridge plugin installed and enabled in RemNote?
+2. Is the RemNote Automation Bridge plugin installed and enabled in RemNote?
 3. Is the daemon running on port 3002? (The bridge connects to this port)
 4. Check daemon logs: `remnote-cli daemon start --foreground --log-level debug`
 

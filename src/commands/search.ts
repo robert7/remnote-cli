@@ -22,7 +22,11 @@ export function registerSearchCommand(program: Command): void {
   program
     .command('search <query>')
     .description('Search for notes in RemNote')
-    .option('-l, --limit <n>', `Maximum results (default: ${DEFAULT_SEARCH_LIMIT})`, String(DEFAULT_SEARCH_LIMIT))
+    .option(
+      '-l, --limit <n>',
+      `Maximum results (default: ${DEFAULT_SEARCH_LIMIT})`,
+      String(DEFAULT_SEARCH_LIMIT)
+    )
     .option('--include-content', 'Include note content in results')
     .action(async (query: string, opts) => {
       const globalOpts = program.opts();

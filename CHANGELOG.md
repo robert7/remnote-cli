@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Daemon architecture: background process hosting WebSocket server (:3002) and HTTP control API (:3100).
-- WebSocket server for RemNote Bridge plugin connectivity (ported from remnote-mcp-server).
+- WebSocket server for RemNote Automation Bridge plugin connectivity (ported from remnote-mcp-server).
 - Daemon lifecycle management: `daemon start`, `daemon stop`, `daemon status` commands.
 - PID file tracking at `~/.remnote-cli/daemon.pid` with stale process detection.
 - Six bridge commands: `create`, `search`, `read`, `update`, `journal`, `status`.
@@ -56,7 +56,7 @@ All notable changes to this project will be documented in this file.
 - Updated `AGENTS.md` to reflect current daemon-based architecture and implemented command/test scope.
 - Updated integration tests to require a pre-running daemon (no test-managed daemon start/stop lifecycle).
 - Updated integration testing guide to document external daemon prerequisite and revised workflow order.
-- Fixed CLI `status` bridge action name to `get_status` for compatibility with current RemNote Bridge plugin.
+- Fixed CLI `status` bridge action name to `get_status` for compatibility with current RemNote Automation Bridge plugin.
 - Added unit coverage to prevent regressions in status action dispatch.
 - Fixed CLI bridge action mappings for `create`, `read`, `update`, and `journal` to use bridge-compatible snake_case names.
 - Fixed `update` payload mapping to send `appendContent` for `--append`.
