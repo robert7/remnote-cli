@@ -1,12 +1,12 @@
 # Integration Testing
 
-Integration tests run real CLI commands against a live daemon with a connected RemNote Bridge plugin. They create
+Integration tests run real CLI commands against a live daemon with a connected RemNote Automation Bridge plugin. They create
 real content in RemNote, prefixed with `[CLI-TEST]` for easy cleanup.
 
 ## Prerequisites
 
 1. RemNote desktop app running
-2. Bridge plugin installed and enabled in RemNote
+2. RemNote Automation Bridge plugin installed and enabled in RemNote
 3. CLI daemon already running (for example: `./run-daemon-in-foreground.sh`)
 4. Project built: `npm run build`
 

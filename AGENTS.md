@@ -22,13 +22,13 @@ Terminology aliases used across docs and discussions:
 
 ## Project Overview
 
-This is a CLI companion app for the RemNote Bridge plugin. It provides a daemon-backed command-line interface for
+This is a CLI companion app for the RemNote Automation Bridge plugin. It provides a daemon-backed command-line interface for
 agentic workflows (for example OpenClaw integrations), with JSON-first output for machine consumers.
 
 **Current architecture:**
 
 ```text
-CLI commands (short-lived) ↔ HTTP Control API :3100 ↔ CLI daemon ↔ WebSocket :3002 ↔ RemNote Bridge Plugin ↔ RemNote
+CLI commands (short-lived) ↔ HTTP Control API :3100 ↔ CLI daemon ↔ WebSocket :3002 ↔ RemNote Automation Bridge plugin ↔ RemNote
 ```
 
 ## Scope and Direction
