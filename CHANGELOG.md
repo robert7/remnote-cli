@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Increased default search limit from 10 to 50
+- Search text output now shows `remType` as compact prefix (`[doc]`, `[concept]`, `[desc]`, etc.) and `detail` as
+  truncated suffix when available
 - Search results no longer include `preview` field (removed upstream in bridge plugin)
 - Updated npm development scripts so `npm run dev` runs the CLI once (no file watching) and added `npm run dev:watch`
   for explicit watch-mode development.
