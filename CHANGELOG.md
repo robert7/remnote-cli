@@ -4,25 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-02-21
+
 ### Added
 
-- Added `docs/demo.md` with a CLI demo walkthrough and screenshot showing daemon start, connection status checks, and
-  successful search flow.
+- Added `docs/demo.md` with a CLI demo walkthrough and an OpenClaw usage example covering daemon status checks and
+  search workflow.
 
 ### Changed
 
-- Increased default search limit from 10 to 50
+- Version advanced from `0.2.0` to `0.5.0` to align with related project versioning in Automation Bridge and MCP
+  Server, making bridge contract alignment more visible.
+- Increased default search limit from 10 to 50.
 - Search text output now shows `remType` as compact prefix (`[doc]`, `[concept]`, `[desc]`, etc.) and `detail` as
-  truncated suffix when available
-- Search results no longer include `preview` field (removed upstream in bridge plugin)
-- Updated npm development scripts so `npm run dev` runs the CLI once (no file watching) and added `npm run dev:watch`
-  for explicit watch-mode development.
-- Updated development setup docs to reflect the new `dev` / `dev:watch` behavior split.
-- Updated `README.md` to link the new demo page near the top of the file and from the Documentation index.
-- Updated `docs/demo.md` with a new OpenClaw chat screenshot section showing `remnote-cli` status, search, and
-  summary-attempt workflow.
-- Updated `docs/demo.md` OpenClaw section with a concise limitation note that full REM + children reads are not yet
-  available and require bridge-side improvements in `remnote-mcp-bridge`.
+  truncated suffix when available.
+- Search results no longer include the `preview` field (removed upstream in the bridge plugin contract).
+- Updated npm development scripts so `npm run dev` runs the CLI once (no file watching), and added
+  `npm run dev:watch` for explicit watch-mode development.
+- Updated documentation for the `dev` / `dev:watch` split and added a bridge limitation note that full REM + children
+  reads are not yet available.
 
 ## [0.2.0] - 2026-02-18
 
