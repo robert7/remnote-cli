@@ -1,9 +1,13 @@
 import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { getRunningDaemon, readPidFile, removePidFile, isProcessAlive } from './pid.js';
 import { SHUTDOWN_TIMEOUT_MS, DEFAULT_HOST } from '../config.js';
 import type { HealthResponse, PidInfo } from '../types/daemon.js';
+
+const require = createRequire(import.meta.url);
+const packageJson = require('../../package.json') as { version: string };
 
 /**
  * Start the daemon. If `foreground` is true, runs in the current process.
@@ -57,6 +61,7 @@ async function runForeground(options: {
     controlPort: options.controlPort,
     host: DEFAULT_HOST,
     logger,
+    cliVersion: packageJson.version,
   });
 
   // Handle graceful shutdown signals

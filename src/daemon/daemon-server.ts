@@ -8,6 +8,7 @@ export interface DaemonServerOptions {
   controlPort: number;
   host: string;
   logger: Logger;
+  cliVersion: string;
 }
 
 /**
@@ -24,7 +25,12 @@ export class DaemonServer {
     this.options = options;
     this.logger = options.logger.child({ context: 'daemon-server' });
 
-    this.wsServer = new WebSocketServer(options.wsPort, options.host, options.logger);
+    this.wsServer = new WebSocketServer(
+      options.wsPort,
+      options.host,
+      options.logger,
+      options.cliVersion
+    );
 
     this.controlServer = new ControlServer(
       options.controlPort,

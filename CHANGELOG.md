@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Automatic version compatibility checks**: Daemon receives bridge `hello` message on connect, stores bridge version,
+  and logs a warning if minor versions differ (0.x rule). `status` command output now includes `cliVersion` and
+  `version_warning` (when bridge/CLI minor versions differ).
+
 ### Enhanced
 
 - `search` command now supports `--include-content <mode>` with `"markdown"` mode for rendered child subtree previews.

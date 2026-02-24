@@ -18,8 +18,12 @@ export function registerStatusCommand(program: Command): void {
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;
             const connected = r.connected ? 'Connected' : 'Not connected';
-            const version = r.pluginVersion ? ` (plugin v${r.pluginVersion})` : '';
-            return `Bridge: ${connected}${version}`;
+            const pluginVersion = r.pluginVersion ? ` (plugin v${r.pluginVersion})` : '';
+            const cliVersion = r.cliVersion ? `CLI: v${r.cliVersion}` : '';
+            const lines = [`Bridge: ${connected}${pluginVersion}`];
+            if (cliVersion) lines.push(cliVersion);
+            if (r.version_warning) lines.push(`WARNING: ${r.version_warning}`);
+            return lines.join('\n');
           })
         );
       } catch (error) {

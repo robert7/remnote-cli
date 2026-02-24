@@ -17,6 +17,8 @@ function createMockWsServer(connected = false) {
     stop: vi.fn(),
     onClientConnect: vi.fn(),
     onClientDisconnect: vi.fn(),
+    getBridgeVersion: vi.fn(() => null),
+    getCliVersion: vi.fn(() => '0.5.0'),
   };
 }
 
@@ -81,6 +83,36 @@ describe('ControlServer', () => {
 
       expect(status).toBe(400);
       expect(body.error).toContain('Missing action');
+    });
+
+    it('enriches get_status with cliVersion', async () => {
+      mockWs.sendRequest.mockResolvedValue({ connected: true, pluginVersion: '0.5.0' });
+      mockWs.getBridgeVersion.mockReturnValue('0.5.0');
+      mockWs.getCliVersion.mockReturnValue('0.5.0');
+
+      const { status, body } = await fetchJson('/execute', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'get_status', payload: {} }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      expect(status).toBe(200);
+      expect(body.result.cliVersion).toBe('0.5.0');
+      expect(body.result.version_warning).toBeUndefined();
+    });
+
+    it('includes version_warning when bridge version mismatches', async () => {
+      mockWs.sendRequest.mockResolvedValue({ connected: true });
+      mockWs.getBridgeVersion.mockReturnValue('0.6.0');
+      mockWs.getCliVersion.mockReturnValue('0.5.0');
+
+      const { body } = await fetchJson('/execute', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'get_status', payload: {} }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      expect(body.result.version_warning).toContain('Version mismatch');
     });
 
     it('returns error when WebSocket request fails', async () => {

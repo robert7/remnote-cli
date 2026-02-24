@@ -1,5 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse, Server } from 'node:http';
 import type { WebSocketServer } from '../websocket/websocket-server.js';
+import { checkVersionCompatibility } from '../version-compat.js';
 import type { Logger } from '../logger.js';
 import type { ControlRequest, ControlResponse, HealthResponse } from '../types/daemon.js';
 
@@ -104,6 +105,23 @@ export class ControlServer {
         }
 
         const result = await this.wsServer.sendRequest(action, payload || {});
+
+        // Enrich get_status responses with version info
+        if (action === 'get_status' && typeof result === 'object' && result !== null) {
+          const cliVersion = this.wsServer.getCliVersion();
+          const bridgeVersion = this.wsServer.getBridgeVersion();
+          const versionWarning = bridgeVersion
+            ? checkVersionCompatibility(cliVersion, bridgeVersion)
+            : null;
+          const enriched = {
+            ...result,
+            cliVersion,
+            ...(versionWarning ? { version_warning: versionWarning } : {}),
+          };
+          this.sendJson(res, 200, { result: enriched } as ControlResponse);
+          return;
+        }
+
         this.sendJson(res, 200, { result } as ControlResponse);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);

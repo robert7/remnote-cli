@@ -24,6 +24,59 @@ function waitForMessage(ws: WebSocket): Promise<string> {
   });
 }
 
+describe('WebSocketServer - Hello Message', () => {
+  let server: WebSocketServer;
+  let client: WebSocket | null = null;
+
+  beforeEach(() => {
+    server = new WebSocketServer(TEST_PORT, TEST_HOST, createSilentLogger(), '0.5.0');
+  });
+
+  afterEach(async () => {
+    if (client && client.readyState === WebSocket.OPEN) {
+      client.close();
+      client = null;
+    }
+    await server.stop();
+  });
+
+  it('stores bridge version from hello message', async () => {
+    await server.start();
+    client = await connectClient(TEST_PORT);
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(server.getBridgeVersion()).toBeNull();
+
+    client.send(JSON.stringify({ type: 'hello', version: '0.5.0' }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(server.getBridgeVersion()).toBe('0.5.0');
+  });
+
+  it('clears bridge version on disconnect', async () => {
+    await server.start();
+    client = await connectClient(TEST_PORT);
+    await new Promise((r) => setTimeout(r, 50));
+
+    client.send(JSON.stringify({ type: 'hello', version: '0.5.0' }));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(server.getBridgeVersion()).toBe('0.5.0');
+
+    const disconnectPromise = new Promise<void>((resolve) => {
+      server.onClientDisconnect(() => resolve());
+    });
+    client.close();
+    client = null;
+    await disconnectPromise;
+
+    expect(server.getBridgeVersion()).toBeNull();
+  });
+
+  it('exposes CLI version', () => {
+    expect(server.getCliVersion()).toBe('0.5.0');
+  });
+});
+
 describe('WebSocketServer', () => {
   let server: WebSocketServer;
   let client: WebSocket | null = null;
