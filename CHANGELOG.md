@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
   a `hello` message, by falling back to `pluginVersion` from the `get_status` response.
 - Integration tests now pass an explicit `search --include-content <mode>` value and cover all three modes
   (`markdown`, `structured`, `none`) with response-shape assertions.
+- Integration tests now cover `read --include-content` modes (`markdown`, `none`) with response-shape assertions for
+  `content` / `contentProperties`.
 
 ### Added
 
