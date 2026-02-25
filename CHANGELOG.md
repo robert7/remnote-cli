@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Expanded `docs/guides/command-reference.md` to fully document daemon subcommands, global flags, option defaults,
+  option-interaction rules, exit codes, and representative usage patterns for automation consumers.
+
 ## [0.6.0] - 2026-02-25
 
 ### Added
