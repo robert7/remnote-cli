@@ -28,6 +28,7 @@ const RED = '\x1b[31m';
 const YELLOW = '\x1b[33m';
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
+const INTEGRATION_PARENT_TITLE = 'RemNote Automation Bridge [temporary integration test data]';
 
 function printBanner(): void {
   console.log(`
@@ -95,6 +96,43 @@ function printSummary(results: WorkflowResult[], totalDurationMs: number): void 
   console.log('Search your RemNote KB for "[CLI-TEST]" to find and delete them.');
 }
 
+async function ensureIntegrationParentNote(cli: CliTestClient, state: SharedState): Promise<void> {
+  const searchResult = (await cli.runExpectSuccess([
+    'search',
+    INTEGRATION_PARENT_TITLE,
+    '--limit',
+    '50',
+  ])) as Record<string, unknown>;
+
+  const candidates = Array.isArray(searchResult.results)
+    ? (searchResult.results as Array<Record<string, unknown>>)
+    : [];
+
+  const exactMatches = candidates.filter(
+    (item) => item.title === INTEGRATION_PARENT_TITLE && typeof item.remId === 'string'
+  );
+
+  if (exactMatches.length > 0) {
+    state.integrationParentRemId = exactMatches[0].remId as string;
+    state.integrationParentTitle = INTEGRATION_PARENT_TITLE;
+    return;
+  }
+
+  const createResult = (await cli.runExpectSuccess(['create', INTEGRATION_PARENT_TITLE])) as Record<
+    string,
+    unknown
+  >;
+
+  if (typeof createResult.remId !== 'string') {
+    throw new Error(
+      `Failed to initialize integration parent note. Response: ${JSON.stringify(createResult)}`
+    );
+  }
+
+  state.integrationParentRemId = createResult.remId;
+  state.integrationParentTitle = INTEGRATION_PARENT_TITLE;
+}
+
 async function main(): Promise<void> {
   const skipConfirm = process.argv.includes('--yes');
   const controlPort = parseInt(process.env.CLI_CONTROL_PORT ?? '3100', 10);
@@ -124,6 +162,17 @@ async function main(): Promise<void> {
   if (daemonStatus.exitCode !== 0) {
     console.error(`${RED}Daemon is not running on control port ${controlPort}.${RESET}`);
     console.error(`Start it first, for example: ./run-daemon-in-foreground.sh`);
+    process.exit(1);
+  }
+
+  try {
+    await ensureIntegrationParentNote(cli, state);
+    console.log(`Integration parent: ${state.integrationParentRemId}`);
+  } catch (e) {
+    console.error(
+      `${RED}Failed to initialize integration parent note "${INTEGRATION_PARENT_TITLE}".${RESET}`
+    );
+    console.error(`${RED}${(e as Error).message}${RESET}`);
     process.exit(1);
   }
 

@@ -5,7 +5,7 @@
  * Skipped if workflow 03 failed or note IDs are missing.
  */
 
-import { assertHasField, assertTruthy } from '../assertions.js';
+import { assertHasField, assertTruthy, assertEqual } from '../assertions.js';
 import type { WorkflowContext, WorkflowResult, SharedState, StepResult } from '../types.js';
 
 function summarizeReadResult(result: Record<string, unknown>): Record<string, unknown> {
@@ -26,12 +26,17 @@ export async function readUpdateWorkflow(
 ): Promise<WorkflowResult> {
   const steps: StepResult[] = [];
 
-  if (!state.noteAId || !state.noteBId) {
+  if (
+    !state.noteAId ||
+    !state.noteBId ||
+    !state.integrationParentRemId ||
+    !state.integrationParentTitle
+  ) {
     return {
       name: 'Read & Update',
       steps: [
         {
-          label: 'Skipped — missing note IDs from Create & Search',
+          label: 'Skipped — missing note IDs or integration parent from Create & Search/setup',
           passed: false,
           durationMs: 0,
           error: 'Prerequisites not met',
@@ -50,6 +55,18 @@ export async function readUpdateWorkflow(
         unknown
       >;
       assertHasField(result, 'title', 'read note A title');
+      assertHasField(result, 'parentRemId', 'read note A parentRemId');
+      assertHasField(result, 'parentTitle', 'read note A parentTitle');
+      assertEqual(
+        result.parentRemId as string,
+        state.integrationParentRemId as string,
+        'read note A parentRemId should match integration parent'
+      );
+      assertEqual(
+        result.parentTitle as string,
+        state.integrationParentTitle as string,
+        'read note A parentTitle should match integration parent'
+      );
       assertTruthy(
         (result.title as string).includes('[CLI-TEST]'),
         'title should contain test prefix'
@@ -80,6 +97,18 @@ export async function readUpdateWorkflow(
       debugResult = result;
       assertHasField(result, 'title', 'read note B title');
       assertHasField(result, 'remId', 'read note B remId');
+      assertHasField(result, 'parentRemId', 'read note B parentRemId');
+      assertHasField(result, 'parentTitle', 'read note B parentTitle');
+      assertEqual(
+        result.parentRemId as string,
+        state.integrationParentRemId as string,
+        'read note B parentRemId should match integration parent'
+      );
+      assertEqual(
+        result.parentTitle as string,
+        state.integrationParentTitle as string,
+        'read note B parentTitle should match integration parent'
+      );
       if (mode === 'markdown') {
         assertHasField(result, 'content', 'read note B markdown');
         assertTruthy(typeof result.content === 'string', 'content should be string');

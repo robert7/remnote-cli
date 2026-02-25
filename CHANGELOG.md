@@ -26,8 +26,12 @@ All notable changes to this project will be documented in this file.
 - `search` command now also supports `--include-content structured`, surfacing bridge `contentStructured` results with
   nested child `remId`s in JSON output for follow-up reads/navigation.
 - `read` command now displays rendered markdown content, aliases, content properties, and type-aware headlines.
+- `search --text` now includes parent context suffix when available (`<- parentTitle [parentRemId]`).
+- `read --text` now includes a `Parent:` line when parent context is available.
 - New options for both commands: `--child-limit`, `--max-content-length`.
 - `search` command shows `headline` (with type-aware delimiters) and `aliases` in text output.
+- Integration workflows now reuse a shared root-level anchor note
+  `RemNote Automation Bridge [temporary integration test data]` and create all test notes under that parent.
 
 ### Changed
 
@@ -37,12 +41,14 @@ All notable changes to this project will be documented in this file.
 - Search content preview default depth is now 1 (CLI `search --depth` help/docs aligned).
 - `search` text output now uses `headline` field for display when available, with aliases shown as `(aka: ...)` suffix.
 - `read` text output restructured: shows headline, type, aliases, card direction, children stats, and rendered content.
+- Standardized root shell script bootstrapping so Node-dependent scripts source `node-check.sh` via script-dir paths at startup (including `publish-to-npm.sh`).
 
 ### Documentation
 
 - Added bridge/plugin compatibility warnings and install guidance links for `0.x` version matching, referencing the canonical bridge-side compatibility guide.
 - Updated command reference defaults/options for `search`/`read` depth and `--include-content <mode>`.
 - Updated command reference examples and option docs for `search --include-content structured`.
+- Updated `AGENTS.md` integration-test policy wording to explicitly require manual human execution for integration tests.
 
 ## [0.5.0] - 2026-02-21
 

@@ -60,7 +60,13 @@ export function registerSearchCommand(program: Command): void {
                 if (note.aliases && Array.isArray(note.aliases) && note.aliases.length > 0) {
                   aliasesSuffix = ` (aka: ${(note.aliases as string[]).join(', ')})`;
                 }
-                return `${i + 1}. ${typeTag}${headline}${aliasesSuffix} [${note.remId}]`;
+                let parentSuffix = '';
+                if (typeof note.parentTitle === 'string' && note.parentTitle.length > 0) {
+                  const parentIdSuffix =
+                    typeof note.parentRemId === 'string' ? ` [${note.parentRemId}]` : '';
+                  parentSuffix = ` <- ${note.parentTitle}${parentIdSuffix}`;
+                }
+                return `${i + 1}. ${typeTag}${headline}${aliasesSuffix}${parentSuffix} [${note.remId}]`;
               })
               .join('\n');
           })

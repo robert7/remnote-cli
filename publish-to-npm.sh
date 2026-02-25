@@ -2,7 +2,8 @@
 # Automated npm publishing script - enforces documented workflow
 set -e
 
-source ./node-check.sh || exit 1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/node-check.sh" || exit 1
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

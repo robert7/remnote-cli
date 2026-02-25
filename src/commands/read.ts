@@ -37,6 +37,10 @@ export function registerReadCommand(program: Command): void {
             }
             if (r.remId) lines.push(`ID: ${r.remId}`);
             if (r.remType) lines.push(`Type: ${r.remType}`);
+            if (typeof r.parentTitle === 'string' && r.parentTitle.length > 0) {
+              const parentIdSuffix = typeof r.parentRemId === 'string' ? ` [${r.parentRemId}]` : '';
+              lines.push(`Parent: ${r.parentTitle}${parentIdSuffix}`);
+            }
             if (r.aliases && Array.isArray(r.aliases) && r.aliases.length > 0) {
               lines.push(`Aliases: ${(r.aliases as string[]).join(', ')}`);
             }

@@ -46,6 +46,9 @@ remnote-cli search "project" --limit 5 --include-content markdown
 remnote-cli search "folders" --include-content structured
 ```
 
+When `parentTitle`/`parentRemId` are present in search results, `--text` output includes parent context
+(`<- Parent Title [parentRemId]`) to make hierarchy location visible at a glance.
+
 ## read
 
 Read a note by its Rem ID.
@@ -57,13 +60,19 @@ remnote-cli read <rem-id> [options]
 | Option | Description |
 |--------|-------------|
 | `-d, --depth <n>` | Depth of children to include (default: 5) |
+| `--include-content <mode>` | Content mode: `markdown` (default) or `none` |
+| `--child-limit <n>` | Maximum children per level (default: 100) |
+| `--max-content-length <n>` | Maximum rendered content length (default: 100000) |
 
 **Examples:**
 
 ```bash
 remnote-cli read abc123def --text
 remnote-cli read abc123def --depth 3
+remnote-cli read abc123def --include-content none --text
 ```
+
+When `parentTitle`/`parentRemId` are present, `--text` output includes a `Parent:` line for quick context.
 
 ## update
 
