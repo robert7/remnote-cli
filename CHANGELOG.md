@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
   - `openclaw-skill/remnote/SKILL.md` with read-first defaults, strict `confirm write` gating for mutating commands,
     bridge/CLI `0.x` compatibility checks, example trigger phrases for OpenClaw auto-activation, and blue `🌀` emoji.
   - `openclaw-skill/README.md` with repository-facing overview of the skill package.
+- Added `openclaw-skill/upload-to-clawhub.sh` to publish the local `remnote` skill to ClawHub using the current
+  `package.json` version, with preview-only default, preview auth precheck via `clawhub whoami`, and explicit
+  `--publish` opt-in for live publish.
 
 ### Changed
 
