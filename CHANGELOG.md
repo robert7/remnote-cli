@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added OpenClaw skill docs under `openclaw-skill/`:
+  - `openclaw-skill/remnote/SKILL.md` with read-first defaults, strict `confirm write` gating for mutating commands,
+    bridge/CLI `0.x` compatibility checks, and example trigger phrases for OpenClaw auto-activation.
+  - `openclaw-skill/README.md` with repository-facing overview of the skill package.
+
 ### Changed
 
 - Expanded `docs/guides/command-reference.md` to fully document daemon subcommands, global flags, option defaults,
