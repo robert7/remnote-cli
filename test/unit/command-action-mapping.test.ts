@@ -38,6 +38,16 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
+  it('passes through structured read content mode', async () => {
+    const executeSpy = await runCommand(['read', 'abc123', '--include-content', 'structured']);
+    expect(executeSpy).toHaveBeenCalledWith('read_note', {
+      remId: 'abc123',
+      depth: 5,
+      includeContent: 'structured',
+    });
+    executeSpy.mockRestore();
+  });
+
   it('maps search command to search with content rendering options', async () => {
     const executeSpy = await runCommand([
       'search',

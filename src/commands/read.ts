@@ -8,7 +8,10 @@ export function registerReadCommand(program: Command): void {
     .command('read <rem-id>')
     .description('Read a note by its Rem ID')
     .option('-d, --depth <n>', 'Depth of child hierarchy to render (default: 5)', '5')
-    .option('--include-content <mode>', 'Content rendering mode: "markdown" (default) or "none"')
+    .option(
+      '--include-content <mode>',
+      'Content rendering mode: "markdown" (default), "none", or "structured"'
+    )
     .option('--child-limit <n>', 'Maximum children per level (default: 100)')
     .option('--max-content-length <n>', 'Maximum content character length (default: 100000)')
     .action(async (remId: string, opts) => {

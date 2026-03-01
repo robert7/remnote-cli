@@ -201,7 +201,7 @@ remnote-cli read <rem-id> [options]
 | Option | Default | Description |
 |--------|---------|-------------|
 | `-d, --depth <n>` | `5` | Child depth to render |
-| `--include-content <mode>` | `markdown` | `markdown` or `none` |
+| `--include-content <mode>` | `markdown` | `markdown`, `structured`, or `none` |
 | `--child-limit <n>` | `100` | Max children per hierarchy level |
 | `--max-content-length <n>` | `100000` | Max rendered content character count |
 
@@ -210,6 +210,7 @@ Behavior rules:
 - `--text` mode prints metadata when present: title/headline, ID, type, parent, aliases, card direction, and content
   stats.
 - If `content` exists, it is printed after a blank line.
+- In structured mode, use JSON output (default) to preserve `contentStructured` rem IDs and child hierarchy.
 - `--include-content none` suppresses rendered content.
 
 Examples:
@@ -217,6 +218,7 @@ Examples:
 ```bash
 remnote-cli read abc123def
 remnote-cli read abc123def --include-content none --depth 2 --child-limit 30 --max-content-length 5000 --text
+remnote-cli read abc123def --include-content structured --depth 2 --child-limit 30
 ```
 
 ## update
