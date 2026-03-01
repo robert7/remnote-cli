@@ -22,6 +22,10 @@ All notable changes to this project will be documented in this file.
   daemon command/contract guidance and removing stale or contradictory instruction detail.
 - `read` now documents and passes through `--include-content structured`, aligning CLI read behavior/docs with
   structured hierarchy traversal use-cases.
+- `openclaw-skill/remnote-kb-navigation/SKILL.md` is now a user-agnostic template with explicit placeholder tokens and
+  "stop if uncustomized" guardrails, plus `openclaw-skill/remnote-kb-navigation/CUSTOMIZATION.md` for per-user setup.
+- `openclaw-skill/remnote/SKILL.md` now clarifies that `remnote-kb-navigation` should be used only when available and
+  customized for the current user.
 
 ### Fixed
 
