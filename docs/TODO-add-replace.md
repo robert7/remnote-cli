@@ -1,6 +1,8 @@
 # TODO: Add Replace Semantics For `update`
 
-This document captures a future enhancement idea so we can resume quickly.
+This document originally captured a future enhancement idea.
+
+Status: core scope implemented in `0.8.0`.
 
 ## Goal
 
@@ -18,13 +20,13 @@ Open design question:
 - Replace only direct child bullets under `<rem-id>`, or
 - Replace the entire descendant subtree.
 
-Direct-child replacement is likely the safer first version.
+Direct-child replacement was selected and implemented as the first version.
 
 ## Why This Is Cross-Repo
 
-Today the bridge contract supports `appendContent` only.
+The bridge contract now supports both `appendContent` and `replaceContent`.
 
-To implement real replace behavior, changes are needed in all companion repos:
+Implemented across companion repos:
 
 1. `remnote-cli`
    - Add `--replace` / `--replace-file` flags and mutual-exclusion rules with append flags.
@@ -34,16 +36,14 @@ To implement real replace behavior, changes are needed in all companion repos:
 3. `remnote-mcp-server`
    - Extend Zod schema + MCP tool input schema/docs so MCP consumers get parity.
 
-## Safety Notes
+## Safety Notes (Current)
 
-- Replace is potentially destructive; UX should prevent accidental data loss.
-- Consider a confirmation gate for non-interactive usage (or strict mutual exclusivity rules).
-- Add precise tests for content preservation, tag/title interactions, and empty replacement behavior.
+- Replace is potentially destructive; bridge settings provide an explicit replace gate.
+- CLI enforces strict mutual exclusion between append and replace content flags.
+- Tests cover replace pass-through, gate behavior, append/replace conflict, and empty replacement behavior.
 
-## Suggested Rollout
+## Remaining Future Ideas
 
-1. Contract proposal and semantics agreement (all three repos).
-2. Bridge implementation + tests.
-3. CLI flags + tests.
-4. MCP schema/docs parity update.
-5. Human-run live validation in RemNote session.
+1. Optional subtree-level replace mode (beyond direct children) if needed.
+2. Optional extra confirmation patterns in interactive environments.
+3. Additional live RemNote validation scenarios with large nested trees.

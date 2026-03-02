@@ -12,7 +12,7 @@ import type { WorkflowContext, WorkflowResult, SharedState, StepResult } from '.
 
 export async function statusWorkflow(
   ctx: WorkflowContext,
-  _state: SharedState
+  state: SharedState
 ): Promise<WorkflowResult> {
   const steps: StepResult[] = [];
 
@@ -80,6 +80,39 @@ export async function statusWorkflow(
     } catch (e) {
       steps.push({
         label: 'CLI/bridge versions are compatible',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 4: Capture write/replace policy flags
+  {
+    const start = Date.now();
+    try {
+      const result = await ctx.cli.runExpectSuccess(['status']);
+      const r = result as Record<string, unknown>;
+      assertHasField(r, 'acceptWriteOperations', 'status result acceptWriteOperations');
+      assertTruthy(
+        typeof r.acceptWriteOperations === 'boolean',
+        'acceptWriteOperations should be a boolean'
+      );
+      assertHasField(r, 'acceptReplaceOperation', 'status result acceptReplaceOperation');
+      assertTruthy(
+        typeof r.acceptReplaceOperation === 'boolean',
+        'acceptReplaceOperation should be a boolean'
+      );
+      state.acceptWriteOperations = r.acceptWriteOperations as boolean;
+      state.acceptReplaceOperation = r.acceptReplaceOperation as boolean;
+      steps.push({
+        label: 'Bridge write/replace policy flags reported',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Bridge write/replace policy flags reported',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,

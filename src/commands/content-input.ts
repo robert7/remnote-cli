@@ -69,6 +69,51 @@ export async function resolveOptionalInlineOrFileContent({
   return inlineText;
 }
 
+interface UpdateContentArgs {
+  appendText: string | undefined;
+  appendFile: string | undefined;
+  replaceText: string | undefined;
+  replaceFile: string | undefined;
+  stdin?: Readable;
+}
+
+interface ResolvedUpdateContent {
+  appendContent: string | undefined;
+  replaceContent: string | undefined;
+}
+
+export async function resolveUpdateContent({
+  appendText,
+  appendFile,
+  replaceText,
+  replaceFile,
+  stdin,
+}: UpdateContentArgs): Promise<ResolvedUpdateContent> {
+  const appendContent = await resolveOptionalInlineOrFileContent({
+    inlineText: appendText,
+    filePath: appendFile,
+    inlineFlag: '--append',
+    fileFlag: '--append-file',
+    stdin,
+  });
+
+  const replaceContent = await resolveOptionalInlineOrFileContent({
+    inlineText: replaceText,
+    filePath: replaceFile,
+    inlineFlag: '--replace',
+    fileFlag: '--replace-file',
+    stdin,
+  });
+
+  if (appendContent !== undefined && replaceContent !== undefined) {
+    throw new Error(
+      'Cannot combine append and replace content options (--append/--append-file with --replace/--replace-file)'
+    );
+  }
+
+  return { appendContent, replaceContent };
+}
+
 interface JournalContentArgs {
   positionalContent: string | undefined;
   optionContent: string | undefined;

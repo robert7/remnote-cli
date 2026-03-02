@@ -79,7 +79,7 @@ If any precondition is missing, stop and fix setup first.
 
 - For write commands, prefer file-based payload flags:
   - `--content-file <path|->` for `create` / `journal`
-  - `--append-file <path|->` for `update`
+  - `--append-file <path|->` or `--replace-file <path|->` for `update`
 - Keep executed command strings short and predictable for OpenClaw allowlisting.
 - Inline `--content` / `--append` and positional `journal [content]` are discouraged except for very short single-line
   text.
@@ -95,6 +95,7 @@ If any precondition is missing, stop and fix setup first.
    - active plugin version
    - CLI version
    - `version_warning` (if present)
+   - write-policy flags: `acceptWriteOperations`, `acceptReplaceOperation`
 4. Enforce version rule: bridge plugin and `remnote-cli` must be the same `0.x` minor line (prefer exact match).
 5. If mismatch:
    - Install matching CLI version:
@@ -143,8 +144,15 @@ If any precondition is missing, stop and fix setup first.
 
 - Create (preferred): `remnote-cli create "Title" --content-file /tmp/body.md --text`
 - Update (preferred): `remnote-cli update <rem-id> --title "New Title" --append-file /tmp/append.md --text`
+- Update replace (destructive, preferred only with explicit user intent):
+  - `remnote-cli update <rem-id> --replace-file /tmp/replacement.md --text`
+  - `remnote-cli update <rem-id> --replace "" --text` (clear all direct children)
 - Journal (preferred): `remnote-cli journal --content-file /tmp/entry.md --text`
 - Fallbacks (discouraged): inline flags or positional `journal [content]` for short single-line text only.
+- Safety:
+  - Never combine append and replace flags in one command.
+  - Run replace only when `acceptWriteOperations=true` and `acceptReplaceOperation=true` from `status`.
+  - Treat replace as destructive and require the user to clearly request replace semantics.
 
 ## Failure Handling
 

@@ -8,7 +8,7 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { assertHasField, assertTruthy, assertEqual } from '../assertions.js';
+import { assertHasField, assertTruthy, assertEqual, assertContains } from '../assertions.js';
 import type { WorkflowContext, WorkflowResult, SharedState, StepResult } from '../types.js';
 
 function summarizeReadResult(result: Record<string, unknown>): Record<string, unknown> {
@@ -43,6 +43,8 @@ export async function readUpdateWorkflow(
   state: SharedState
 ): Promise<WorkflowResult> {
   const steps: StepResult[] = [];
+  const acceptWriteOperations = state.acceptWriteOperations ?? true;
+  const acceptReplaceOperation = acceptWriteOperations && (state.acceptReplaceOperation ?? false);
 
   if (
     !state.noteAId ||
@@ -165,25 +167,50 @@ export async function readUpdateWorkflow(
     }
   }
 
-  // Step 3: Update note A — append content
+  // Step 3: Update note A — append content (or validate write gate rejection)
   {
     const start = Date.now();
     try {
-      const result = (await withTempContentFile(
-        'Appended by CLI integration test',
-        async (contentPath) =>
-          (await ctx.cli.runExpectSuccess([
-            'update',
-            state.noteAId,
-            '--append-file',
-            contentPath,
-          ])) as Record<string, unknown>
-      )) as Record<string, unknown>;
-      assertHasField(result, 'remId', 'update note A');
-      steps.push({ label: 'Update note A (append)', passed: true, durationMs: Date.now() - start });
+      if (acceptWriteOperations) {
+        const result = (await withTempContentFile(
+          'Appended by CLI integration test',
+          async (contentPath) =>
+            (await ctx.cli.runExpectSuccess([
+              'update',
+              state.noteAId,
+              '--append-file',
+              contentPath,
+            ])) as Record<string, unknown>
+        )) as Record<string, unknown>;
+        assertHasField(result, 'remId', 'update note A');
+        steps.push({
+          label: 'Update note A (append)',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      } else {
+        const result = await ctx.cli.runExpectError([
+          'update',
+          state.noteAId,
+          '--append',
+          'Should be blocked',
+        ]);
+        assertContains(
+          result.stderr,
+          'Write operations are disabled by bridge settings',
+          'append should be blocked when write operations are disabled'
+        );
+        steps.push({
+          label: 'Update note A (append) blocked by write gate',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      }
     } catch (e) {
       steps.push({
-        label: 'Update note A (append)',
+        label: acceptWriteOperations
+          ? 'Update note A (append)'
+          : 'Update note A (append) blocked by write gate',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,
@@ -191,25 +218,168 @@ export async function readUpdateWorkflow(
     }
   }
 
-  // Step 4: Update note B — add tags
+  // Step 4: Update note B — add tags (or validate write gate rejection)
   {
+    const start = Date.now();
+    try {
+      if (acceptWriteOperations) {
+        const result = (await ctx.cli.runExpectSuccess([
+          'update',
+          state.noteBId,
+          '--add-tags',
+          'cli-test-added',
+        ])) as Record<string, unknown>;
+        assertHasField(result, 'remId', 'update note B add tags');
+        steps.push({
+          label: 'Update note B (add tags)',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      } else {
+        const result = await ctx.cli.runExpectError([
+          'update',
+          state.noteBId,
+          '--add-tags',
+          'cli-test-added',
+        ]);
+        assertContains(
+          result.stderr,
+          'Write operations are disabled by bridge settings',
+          'add tags should be blocked when write operations are disabled'
+        );
+        steps.push({
+          label: 'Update note B (add tags) blocked by write gate',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      }
+    } catch (e) {
+      steps.push({
+        label: acceptWriteOperations
+          ? 'Update note B (add tags)'
+          : 'Update note B (add tags) blocked by write gate',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 5: Replace note A content (or validate gate rejection)
+  {
+    const start = Date.now();
+    try {
+      if (acceptReplaceOperation) {
+        const replaceBody = `[CLI-TEST] Replaced via integration test ${ctx.runId}`;
+        const result = (await withTempContentFile(
+          replaceBody,
+          async (contentPath) =>
+            (await ctx.cli.runExpectSuccess([
+              'update',
+              state.noteAId,
+              '--replace-file',
+              contentPath,
+            ])) as Record<string, unknown>
+        )) as Record<string, unknown>;
+        assertHasField(result, 'remId', 'replace note A');
+
+        const reread = (await ctx.cli.runExpectSuccess([
+          'read',
+          state.noteAId,
+          '--include-content',
+          'markdown',
+        ])) as Record<string, unknown>;
+        assertTruthy(typeof reread.content === 'string', 're-read content should be a string');
+        assertContains(
+          reread.content as string,
+          replaceBody,
+          're-read content should include replaced body'
+        );
+        steps.push({
+          label: 'Update note A (replace)',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      } else if (acceptWriteOperations) {
+        const result = await ctx.cli.runExpectError([
+          'update',
+          state.noteAId,
+          '--replace',
+          'Should be blocked',
+        ]);
+        assertContains(
+          result.stderr,
+          'Replace operation is disabled',
+          'replace should be blocked when replace gate is disabled'
+        );
+        steps.push({
+          label: 'Update note A (replace) blocked by replace gate',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      } else {
+        const result = await ctx.cli.runExpectError([
+          'update',
+          state.noteAId,
+          '--replace',
+          'Should be blocked',
+        ]);
+        assertContains(
+          result.stderr,
+          'Write operations are disabled by bridge settings',
+          'replace should be blocked when write operations are disabled'
+        );
+        steps.push({
+          label: 'Update note A (replace) blocked by write gate',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      }
+    } catch (e) {
+      steps.push({
+        label: acceptReplaceOperation
+          ? 'Update note A (replace)'
+          : acceptWriteOperations
+            ? 'Update note A (replace) blocked by replace gate'
+            : 'Update note A (replace) blocked by write gate',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 6: Empty replace clears direct children (when replace is enabled)
+  if (acceptReplaceOperation) {
     const start = Date.now();
     try {
       const result = (await ctx.cli.runExpectSuccess([
         'update',
-        state.noteBId,
-        '--add-tags',
-        'cli-test-added',
+        state.noteAId,
+        '--replace',
+        '',
       ])) as Record<string, unknown>;
-      assertHasField(result, 'remId', 'update note B add tags');
+      assertHasField(result, 'remId', 'empty replace note A');
+
+      const reread = (await ctx.cli.runExpectSuccess([
+        'read',
+        state.noteAId,
+        '--include-content',
+        'markdown',
+      ])) as Record<string, unknown>;
+      assertEqual(
+        (reread.content as string | undefined) ?? '',
+        '',
+        'empty replace should clear markdown content'
+      );
       steps.push({
-        label: 'Update note B (add tags)',
+        label: 'Update note A (empty replace clears children)',
         passed: true,
         durationMs: Date.now() - start,
       });
     } catch (e) {
       steps.push({
-        label: 'Update note B (add tags)',
+        label: 'Update note A (empty replace clears children)',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,
@@ -217,7 +387,7 @@ export async function readUpdateWorkflow(
     }
   }
 
-  // Step 5: Re-read note A to verify update
+  // Step 7: Re-read note A to verify update
   {
     const start = Date.now();
     try {

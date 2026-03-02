@@ -5,7 +5,7 @@
  * nonexistent IDs, missing args, empty queries.
  */
 
-import { assertTruthy } from '../assertions.js';
+import { assertTruthy, assertContains } from '../assertions.js';
 import type { WorkflowContext, WorkflowResult, SharedState, StepResult } from '../types.js';
 
 export async function errorCasesWorkflow(
@@ -77,6 +77,39 @@ export async function errorCasesWorkflow(
     } catch (e) {
       steps.push({
         label: 'Search with empty query handled gracefully',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 4: Update rejects append + replace conflict
+  {
+    const start = Date.now();
+    try {
+      const result = await ctx.cli.runExpectError([
+        'update',
+        'conflict-id-00000',
+        '--append',
+        'Append body',
+        '--replace',
+        'Replace body',
+      ]);
+      assertTruthy(result.exitCode !== 0, 'should have non-zero exit code');
+      assertContains(
+        result.stderr,
+        'Cannot combine append and replace content options',
+        'stderr should explain append/replace conflict'
+      );
+      steps.push({
+        label: 'Update append/replace conflict returns error',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Update append/replace conflict returns error',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,

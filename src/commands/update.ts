@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { DaemonClient } from '../client/daemon-client.js';
 import { formatResult, formatError, type OutputFormat } from '../output/formatter.js';
 import { EXIT } from '../config.js';
-import { resolveOptionalInlineOrFileContent } from './content-input.js';
+import { resolveUpdateContent } from './content-input.js';
 
 export function registerUpdateCommand(program: Command): void {
   program
@@ -11,6 +11,11 @@ export function registerUpdateCommand(program: Command): void {
     .option('--title <text>', 'New title')
     .option('--append <text>', 'Append content')
     .option('--append-file <path>', 'Read appended content from UTF-8 file ("-" for stdin)')
+    .option('--replace <text>', 'Replace direct child content (empty string clears all children)')
+    .option(
+      '--replace-file <path>',
+      'Read replacement content from UTF-8 file ("-" for stdin; empty file clears all children)'
+    )
     .option('--add-tags <tags...>', 'Tags to add')
     .option('--remove-tags <tags...>', 'Tags to remove')
     .action(async (remId: string, opts) => {
@@ -19,16 +24,17 @@ export function registerUpdateCommand(program: Command): void {
       const client = new DaemonClient(parseInt(globalOpts.controlPort, 10));
 
       try {
-        const appendContent = await resolveOptionalInlineOrFileContent({
-          inlineText: opts.append as string | undefined,
-          filePath: opts.appendFile as string | undefined,
-          inlineFlag: '--append',
-          fileFlag: '--append-file',
+        const { appendContent, replaceContent } = await resolveUpdateContent({
+          appendText: opts.append as string | undefined,
+          appendFile: opts.appendFile as string | undefined,
+          replaceText: opts.replace as string | undefined,
+          replaceFile: opts.replaceFile as string | undefined,
         });
 
         const payload: Record<string, unknown> = { remId };
         if (opts.title) payload.title = opts.title;
         if (appendContent !== undefined) payload.appendContent = appendContent;
+        if (replaceContent !== undefined) payload.replaceContent = replaceContent;
         if (opts.addTags) payload.addTags = opts.addTags;
         if (opts.removeTags) payload.removeTags = opts.removeTags;
 

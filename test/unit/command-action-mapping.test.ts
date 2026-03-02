@@ -163,6 +163,25 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
+  it('maps update --replace to update_note replaceContent payload', async () => {
+    const executeSpy = await runCommand(['update', 'abc123', '--replace', 'Replaced content']);
+    expect(executeSpy).toHaveBeenCalledWith('update_note', {
+      remId: 'abc123',
+      replaceContent: 'Replaced content',
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps update --replace-file to update_note replaceContent payload', async () => {
+    const filePath = await createTempContentFile('Replace from file');
+    const executeSpy = await runCommand(['update', 'abc123', '--replace-file', filePath]);
+    expect(executeSpy).toHaveBeenCalledWith('update_note', {
+      remId: 'abc123',
+      replaceContent: 'Replace from file',
+    });
+    executeSpy.mockRestore();
+  });
+
   it('maps journal command to append_journal', async () => {
     const executeSpy = await runCommand(['journal', 'Entry', '--no-timestamp']);
     expect(executeSpy).toHaveBeenCalledWith('append_journal', {

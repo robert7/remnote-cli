@@ -1,6 +1,6 @@
 {
   "name": "remnote-cli",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "CLI companion app for RemNote Bridge via WebSocket",
   "type": "module",
   "main": "dist/index.js",

@@ -28,6 +28,8 @@ export interface SharedState {
   searchByTagTag?: string;
   noteAId?: string;
   noteBId?: string;
+  acceptWriteOperations?: boolean;
+  acceptReplaceOperation?: boolean;
 }
 
 /** A workflow function signature. */
