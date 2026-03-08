@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 - Renamed the local OpenClaw skill package directory to `skills/` and updated live repository references, including
   the ClawHub upload script path.
+- Extended `./code-quality.sh` to validate and package every committed skill under `skills/` using the local
+  `skill-creator` tooling before running the Node test suite.
 
 ## [0.8.0] - 2026-03-04
 
