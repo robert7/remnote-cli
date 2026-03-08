@@ -4,7 +4,7 @@ This template must be customized per user before use.
 
 ## Steps
 
-1. Copy or edit `openclaw-skill/remnote-kb-navigation/SKILL.md` for the target user.
+1. Copy or edit `skills/remnote-kb-navigation/SKILL.md` for the target user.
 2. Replace every `TEMPLATE_...` token.
 3. Find the user's root note ID and headline.
 4. Build top-level branch map from root children.

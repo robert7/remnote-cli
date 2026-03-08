@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: openclaw-skill/upload-to-clawhub.sh [--publish]
+Usage: skills/upload-to-clawhub.sh [--publish]
 
 Publish the local remnote OpenClaw skill to ClawHub.
 
@@ -51,7 +51,7 @@ if ! command -v clawhub >/dev/null 2>&1; then
   exit 1
 fi
 
-SKILL_PATH="${REPO_ROOT}/openclaw-skills/remnote"
+SKILL_PATH="${REPO_ROOT}/skills/remnote"
 if [[ ! -f "${SKILL_PATH}/SKILL.md" ]]; then
   echo "Skill file not found: ${SKILL_PATH}/SKILL.md" >&2
   exit 1

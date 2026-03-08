@@ -2,16 +2,6 @@
 
 This file is a map for AI agents working in `remnote-cli`.
 
-## Start Here First (Mandatory)
-
-Read these before making changes:
-
-1. `.agents/dev-requirements.md`
-2. `.agents/dev-workflow.md`
-3. `.agents/dev-documentation.md` (required before docs edits)
-4. `.agents/dev-python-conventions.md` (if touching Python helper scripts)
-5. `.agents/PLANS.md` (required for complex work / major refactors)
-
 ## Repo Role
 
 This repo is the CLI companion app for the RemNote bridge plugin. It uses a daemon model:

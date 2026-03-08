@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed the local OpenClaw skill package directory to `skills/` and updated live repository references, including
+  the ClawHub upload script path.
+
 ## [0.8.0] - 2026-03-04
 
 ### Added
