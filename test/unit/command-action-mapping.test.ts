@@ -59,6 +59,49 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
+  it('maps create command with flashcard options to create_note', async () => {
+    const executeSpy = await runCommand([
+      'create',
+      'Front',
+      '--back-text',
+      'Back',
+      '--concept',
+    ]);
+    expect(executeSpy).toHaveBeenCalledWith('create_note', {
+      title: 'Front',
+      backText: 'Back',
+      isConcept: true,
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps create-md command to create_note_md', async () => {
+    const executeSpy = await runCommand([
+      'create-md',
+      '--title',
+      'Root',
+      '--content',
+      '- Item 1\n  - Item 2\n',
+      '--tags',
+      'md-tag',
+    ]);
+    expect(executeSpy).toHaveBeenCalledWith('create_note_md', {
+      title: 'Root',
+      content: '- Item 1\n  - Item 2\n',
+      tags: ['md-tag'],
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps create-md --content-file to create_note_md', async () => {
+    const filePath = await createTempContentFile('- Item from file');
+    const executeSpy = await runCommand(['create-md', '--content-file', filePath]);
+    expect(executeSpy).toHaveBeenCalledWith('create_note_md', {
+      content: '- Item from file',
+    });
+    executeSpy.mockRestore();
+  });
+
   it('maps read command to read_note', async () => {
     const executeSpy = await runCommand(['read', 'abc123', '--depth', '2']);
     expect(executeSpy).toHaveBeenCalledWith('read_note', { remId: 'abc123', depth: 2 });

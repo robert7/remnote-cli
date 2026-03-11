@@ -17,6 +17,7 @@ describe('createProgram', () => {
 
     expect(commandNames).toContain('daemon');
     expect(commandNames).toContain('create');
+    expect(commandNames).toContain('create-md');
     expect(commandNames).toContain('search');
     expect(commandNames).toContain('search-tag');
     expect(commandNames).toContain('read');
