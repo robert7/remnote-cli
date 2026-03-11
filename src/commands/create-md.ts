@@ -4,18 +4,16 @@ import { formatResult, formatError, type OutputFormat } from '../output/formatte
 import { EXIT } from '../config.js';
 import { resolveOptionalInlineOrFileContent } from './content-input.js';
 
-export function registerCreateCommand(program: Command): void {
+export function registerCreateMdCommand(program: Command): void {
   program
-    .command('create <title>')
-    .description('Create a new note in RemNote')
-    .option('-c, --content <text>', 'Note content')
-    .option('--content-file <path>', 'Read note content from UTF-8 file ("-" for stdin)')
+    .command('create-md')
+    .description('Create a hierarchical note tree in RemNote from a markdown string')
+    .option('-c, --content <text>', 'Markdown content')
+    .option('--content-file <path>', 'Read markdown content from UTF-8 file ("-" for stdin)')
+    .option('--title <text>', 'Optional root Rem title to enclose the entire tree')
     .option('--parent-id <id>', 'Parent Rem ID')
     .option('-t, --tags <tags...>', 'Tags to add')
-    .option('-b, --back-text <text>', 'Back text for creating a flashcard')
-    .option('--concept', 'Create as a Concept card (::)', false)
-    .option('--descriptor', 'Create as a Descriptor card (;;)', false)
-    .action(async (title: string, opts) => {
+    .action(async (opts) => {
       const globalOpts = program.opts();
       const format: OutputFormat = globalOpts.text ? 'text' : 'json';
       const client = new DaemonClient(parseInt(globalOpts.controlPort, 10));
@@ -28,19 +26,21 @@ export function registerCreateCommand(program: Command): void {
           fileFlag: '--content-file',
         });
 
-        const payload: Record<string, unknown> = { title };
-        if (content !== undefined) payload.content = content;
+        if (content === undefined) {
+          throw new Error('Markdown content is required via --content or --content-file');
+        }
+
+        const payload: Record<string, unknown> = { content };
+        if (opts.title) payload.title = opts.title;
         if (opts.parentId) payload.parentId = opts.parentId;
         if (opts.tags) payload.tags = opts.tags;
-        if (opts.backText !== undefined) payload.backText = opts.backText;
-        if (opts.concept) payload.isConcept = true;
-        if (opts.descriptor) payload.isDescriptor = true;
 
-        const result = await client.execute('create_note', payload);
+        const result = await client.execute('create_note_md', payload);
         console.log(
           formatResult(result, format, (data) => {
             const r = data as Record<string, unknown>;
-            return `Created note: ${title} (ID: ${r.remId || 'unknown'})`;
+            const ids = Array.isArray(r.remIds) ? r.remIds.join(', ') : 'unknown';
+            return `Created markdown tree: ${opts.title || '(root)'} (IDs: ${ids})`;
           })
         );
       } catch (error) {
