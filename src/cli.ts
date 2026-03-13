@@ -3,7 +3,6 @@ import { createRequire } from 'node:module';
 import { DEFAULT_CONTROL_PORT } from './config.js';
 import { registerDaemonCommand } from './commands/daemon.js';
 import { registerCreateCommand } from './commands/create.js';
-import { registerCreateMdCommand } from './commands/create-md.js';
 import { registerSearchByTagCommand, registerSearchCommand } from './commands/search.js';
 import { registerReadCommand } from './commands/read.js';
 import { registerUpdateCommand } from './commands/update.js';
@@ -27,7 +26,6 @@ export function createProgram(version: string): Command {
 
   registerDaemonCommand(program);
   registerCreateCommand(program);
-  registerCreateMdCommand(program);
   registerSearchCommand(program);
   registerSearchByTagCommand(program);
   registerReadCommand(program);
