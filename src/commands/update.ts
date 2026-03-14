@@ -41,8 +41,13 @@ export function registerUpdateCommand(program: Command): void {
         const result = await client.execute('update_note', payload);
         console.log(
           formatResult(result, format, (data) => {
-            const r = data as Record<string, unknown>;
-            return `Updated note ${r.remId || remId}`;
+            const r = data as { remIds?: string[]; titles?: string[] };
+            const ids = r.remIds || [];
+            const titles = r.titles || [];
+            if (ids.length === 0) return `Updated note ${remId} (no Rems created)`;
+            return titles
+              .map((t, i) => `Updated/Created: ${t || '(untitled)'} (ID: ${ids[i] || 'unknown'})`)
+              .join('\n');
           })
         );
       } catch (error) {

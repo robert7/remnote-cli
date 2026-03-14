@@ -31,8 +31,13 @@ export function registerJournalCommand(program: Command): void {
         const result = await client.execute('append_journal', payload);
         console.log(
           formatResult(result, format, (data) => {
-            const r = data as Record<string, unknown>;
-            return `Journal entry added${r.remId ? ` (ID: ${r.remId})` : ''}`;
+            const r = data as { remIds?: string[]; titles?: string[] };
+            const ids = r.remIds || [];
+            const titles = r.titles || [];
+            if (ids.length === 0) return 'No journal entry Rems created.';
+            return titles
+              .map((t, i) => `Journal entry added: ${t || '(untitled)'} (ID: ${ids[i] || 'unknown'})`)
+              .join('\n');
           })
         );
       } catch (error) {
