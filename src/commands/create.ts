@@ -6,14 +6,14 @@ import { resolveOptionalInlineOrFileContent } from './content-input.js';
 
 export function registerCreateCommand(program: Command): void {
   program
-    .command('create [title] [content]')
+    .command('create [title]')
     .description('Create a new note in RemNote (title or content required)')
     .option('--title <text>', 'Note title')
     .option('-c, --content <text>', 'Note content (markdown/flashcard supported)')
     .option('--content-file <path>', 'Read note content from UTF-8 file ("-" for stdin)')
     .option('--parent-id <id>', 'Parent Rem ID')
     .option('-t, --tags <tags...>', 'Tags to add')
-    .action(async (titleArg: string | undefined, contentArg: string | undefined, opts) => {
+    .action(async (titleArg: string | undefined, opts) => {
       const globalOpts = program.opts();
       const format: OutputFormat = globalOpts.text ? 'text' : 'json';
       const client = new DaemonClient(parseInt(globalOpts.controlPort, 10));
@@ -23,14 +23,12 @@ export function registerCreateCommand(program: Command): void {
         const title = titleArg || (opts.title as string | undefined);
         if (title !== undefined) payload.title = title;
 
-        const content =
-          contentArg ||
-          (await resolveOptionalInlineOrFileContent({
-            inlineText: opts.content as string | undefined,
-            filePath: opts.contentFile as string | undefined,
-            inlineFlag: '--content',
-            fileFlag: '--content-file',
-          }));
+        const content = await resolveOptionalInlineOrFileContent({
+          inlineText: opts.content as string | undefined,
+          filePath: opts.contentFile as string | undefined,
+          inlineFlag: '--content',
+          fileFlag: '--content-file',
+        });
 
         if (content !== undefined) payload.content = content;
         if (opts.parentId) payload.parentId = opts.parentId;
