@@ -245,6 +245,7 @@ export async function createSearchWorkflow(
       const result = (await ctx.cli.runExpectSuccess([
         'create',
         `[CLI-TEST] Flashcard Note ${ctx.runId}`,
+        '--content',
         'Front :: Back',
         '--parent-id',
         state.integrationParentRemId as string,

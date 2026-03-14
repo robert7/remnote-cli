@@ -59,8 +59,8 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
-  it('maps create command with title and content positional args', async () => {
-    const executeSpy = await runCommand(['create', 'Title', 'Body']);
+  it('maps create command with title positional and --content opt', async () => {
+    const executeSpy = await runCommand(['create', 'Title', '--content', 'Body']);
     expect(executeSpy).toHaveBeenCalledWith('create_note', {
       title: 'Title',
       content: 'Body',
@@ -101,11 +101,9 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
-  it('maps create command with content-only positional arg', async () => {
-    const executeSpy = await runCommand(['create', '', 'Body']);
-    expect(executeSpy).toHaveBeenCalledWith('create_note', {
-      content: 'Body',
-    });
+  it('maps create command with no args (bridge-side error)', async () => {
+    const executeSpy = await runCommand(['create']);
+    expect(executeSpy).toHaveBeenCalledWith('create_note', {});
     executeSpy.mockRestore();
   });
 
@@ -192,10 +190,12 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
-  it('maps update command to update_note with appendContent payload', async () => {
+  it('maps update command with --title flag', async () => {
     const executeSpy = await runCommand([
       'update',
       'abc123',
+      '--title',
+      'New Title',
       '--append',
       'More text',
       '--add-tags',
@@ -203,6 +203,7 @@ describe('command bridge action mapping', () => {
     ]);
     expect(executeSpy).toHaveBeenCalledWith('update_note', {
       remId: 'abc123',
+      title: 'New Title',
       appendContent: 'More text',
       addTags: ['important'],
     });
@@ -238,10 +239,10 @@ describe('command bridge action mapping', () => {
     executeSpy.mockRestore();
   });
 
-  it('maps journal command to append_journal', async () => {
-    const executeSpy = await runCommand(['journal', 'Entry', '--no-timestamp']);
+  it('maps journal command with positional content', async () => {
+    const executeSpy = await runCommand(['journal', 'Positional Entry', '--no-timestamp']);
     expect(executeSpy).toHaveBeenCalledWith('append_journal', {
-      content: 'Entry',
+      content: 'Positional Entry',
       timestamp: false,
     });
     executeSpy.mockRestore();

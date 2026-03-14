@@ -132,7 +132,7 @@ with "quotes" and \`ticks\``;
     ).resolves.toBe('from positional');
   });
 
-  it('requires exactly one journal content source', async () => {
+  it('rejects multiple journal content sources', async () => {
     await expect(
       resolveJournalContent({
         positionalContent: 'old',

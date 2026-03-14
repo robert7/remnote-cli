@@ -177,12 +177,12 @@ export async function readUpdateWorkflow(
           async (contentPath) =>
             (await ctx.cli.runExpectSuccess([
               'update',
-              state.noteAId,
+              state.noteAId as string,
               '--append-file',
               contentPath,
             ])) as Record<string, unknown>
         )) as Record<string, unknown>;
-        assertHasField(result, 'remId', 'update note A');
+        assertHasField(result, 'remIds', 'update note A');
         steps.push({
           label: 'Update note A (append)',
           passed: true,
@@ -191,7 +191,7 @@ export async function readUpdateWorkflow(
       } else {
         const result = await ctx.cli.runExpectError([
           'update',
-          state.noteAId,
+          state.noteAId as string,
           '--append',
           'Should be blocked',
         ]);
@@ -225,11 +225,11 @@ export async function readUpdateWorkflow(
       if (acceptWriteOperations) {
         const result = (await ctx.cli.runExpectSuccess([
           'update',
-          state.noteBId,
+          state.noteBId as string,
           '--add-tags',
           'cli-test-added',
         ])) as Record<string, unknown>;
-        assertHasField(result, 'remId', 'update note B add tags');
+        assertHasField(result, 'remIds', 'update note B add tags');
         steps.push({
           label: 'Update note B (add tags)',
           passed: true,
@@ -238,7 +238,7 @@ export async function readUpdateWorkflow(
       } else {
         const result = await ctx.cli.runExpectError([
           'update',
-          state.noteBId,
+          state.noteBId as string,
           '--add-tags',
           'cli-test-added',
         ]);
@@ -276,16 +276,16 @@ export async function readUpdateWorkflow(
           async (contentPath) =>
             (await ctx.cli.runExpectSuccess([
               'update',
-              state.noteAId,
+              state.noteAId as string,
               '--replace-file',
               contentPath,
             ])) as Record<string, unknown>
         )) as Record<string, unknown>;
-        assertHasField(result, 'remId', 'replace note A');
+        assertHasField(result, 'remIds', 'replace note A');
 
         const reread = (await ctx.cli.runExpectSuccess([
           'read',
-          state.noteAId,
+          state.noteAId as string,
           '--include-content',
           'markdown',
         ])) as Record<string, unknown>;
@@ -303,7 +303,7 @@ export async function readUpdateWorkflow(
       } else if (acceptWriteOperations) {
         const result = await ctx.cli.runExpectError([
           'update',
-          state.noteAId,
+          state.noteAId as string,
           '--replace',
           'Should be blocked',
         ]);
@@ -320,7 +320,7 @@ export async function readUpdateWorkflow(
       } else {
         const result = await ctx.cli.runExpectError([
           'update',
-          state.noteAId,
+          state.noteAId as string,
           '--replace',
           'Should be blocked',
         ]);
@@ -355,15 +355,15 @@ export async function readUpdateWorkflow(
     try {
       const result = (await ctx.cli.runExpectSuccess([
         'update',
-        state.noteAId,
+        state.noteAId as string,
         '--replace',
         '',
       ])) as Record<string, unknown>;
-      assertHasField(result, 'remId', 'empty replace note A');
+      assertHasField(result, 'remIds', 'empty replace note A');
 
       const reread = (await ctx.cli.runExpectSuccess([
         'read',
-        state.noteAId,
+        state.noteAId as string,
         '--include-content',
         'markdown',
       ])) as Record<string, unknown>;
@@ -376,7 +376,7 @@ export async function readUpdateWorkflow(
         label: 'Update note A (empty replace clears children)',
         passed: true,
         durationMs: Date.now() - start,
-      });
+        });
     } catch (e) {
       steps.push({
         label: 'Update note A (empty replace clears children)',
@@ -404,6 +404,82 @@ export async function readUpdateWorkflow(
     } catch (e) {
       steps.push({
         label: 'Re-read note A (verify update)',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 8: Update note A with a markdown tree
+  if (acceptWriteOperations) {
+    const start = Date.now();
+    try {
+      const markdownTree = `[CLI-TEST] Markdown Tree ${ctx.runId}\n- Branch 1\n  - Leaf 1\n- Branch 2`;
+      const result = (await withTempContentFile(
+        markdownTree,
+        async (contentPath) =>
+          (await ctx.cli.runExpectSuccess([
+            'update',
+            state.noteAId as string,
+            '--append-file',
+            contentPath,
+          ])) as Record<string, unknown>
+      )) as Record<string, unknown>;
+      assertHasField(result, 'remIds', 'update note A markdown tree');
+      // Should create multiple Rems (root + branches + leaf)
+      assertTruthy((result.remIds as string[]).length >= 4, 'should create multiple rems for tree');
+
+      steps.push({
+        label: 'Update note A (append markdown tree)',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Update note A (append markdown tree)',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 9: Replace note A with another markdown tree
+  if (acceptReplaceOperation) {
+    const start = Date.now();
+    try {
+      const markdownTree = `[CLI-TEST] Replaced Tree ${ctx.runId}\n- New Branch\n  - New Leaf`;
+      const result = (await withTempContentFile(
+        markdownTree,
+        async (contentPath) =>
+          (await ctx.cli.runExpectSuccess([
+            'update',
+            state.noteAId as string,
+            '--replace-file',
+            contentPath,
+          ])) as Record<string, unknown>
+      )) as Record<string, unknown>;
+      assertHasField(result, 'remIds', 'update note A replace markdown tree');
+      assertTruthy((result.remIds as string[]).length >= 3, 'should create multiple rems for replaced tree');
+
+      const reread = (await ctx.cli.runExpectSuccess([
+        'read',
+        state.noteAId as string,
+        '--include-content',
+        'markdown',
+      ])) as Record<string, unknown>;
+      assertContains(reread.content as string, 'New Branch', 'should contain replaced tree content');
+      assertContains(reread.content as string, 'New Leaf', 'should contain replaced tree content');
+
+      steps.push({
+        label: 'Update note A (replace markdown tree)',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Update note A (replace markdown tree)',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,
