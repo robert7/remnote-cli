@@ -66,7 +66,9 @@ export async function resolveOptionalInlineOrFileContent({
   if (filePath !== undefined) {
     return readContentFileOrStdin(filePath, stdin);
   }
-  return inlineText;
+
+  // convert literal \n strings into actual newline characters
+  return inlineText?.replace(/\\n/g, '\n');
 }
 
 interface UpdateContentArgs {

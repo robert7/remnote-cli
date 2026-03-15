@@ -3,18 +3,22 @@ import { DaemonClient } from '../client/daemon-client.js';
 import { formatResult, formatError, type OutputFormat } from '../output/formatter.js';
 import { EXIT } from '../config.js';
 import { resolveUpdateContent } from './content-input.js';
+import { validateNotFlag } from './arg-utils.js';
 
 export function registerUpdateCommand(program: Command): void {
-  program
-    .command('update <rem-id>')
+  const subprogram = program.command('update <rem-id>');
+  const validate = (val: string) => validateNotFlag(val, subprogram);
+
+  subprogram
     .description('Update an existing note')
-    .option('--title <text>', 'New title')
-    .option('--append <text>', 'Append content')
-    .option('--append-file <path>', 'Read appended content from UTF-8 file ("-" for stdin)')
-    .option('--replace <text>', 'Replace direct child content (empty string clears all children)')
+    .option('--title <text>', 'New title', validate)
+    .option('--append <text>', 'Append content', validate)
+    .option('--append-file <path>', 'Read appended content from UTF-8 file ("-" for stdin)', validate)
+    .option('--replace <text>', 'Replace direct child content (empty string clears all children)', validate)
     .option(
       '--replace-file <path>',
-      'Read replacement content from UTF-8 file ("-" for stdin; empty file clears all children)'
+      'Read replacement content from UTF-8 file ("-" for stdin; empty file clears all children)',
+      validate
     )
     .option('--add-tags <tags...>', 'Tags to add')
     .option('--remove-tags <tags...>', 'Tags to remove')
@@ -35,14 +39,19 @@ export function registerUpdateCommand(program: Command): void {
         if (opts.title) payload.title = opts.title;
         if (appendContent !== undefined) payload.appendContent = appendContent;
         if (replaceContent !== undefined) payload.replaceContent = replaceContent;
-        if (opts.addTags) payload.addTags = opts.addTags;
-        if (opts.removeTags) payload.removeTags = opts.removeTags;
+        if (opts.addTags && opts.addTags.length > 0) payload.addTags = opts.addTags;
+        if (opts.removeTags && opts.removeTags.length > 0) payload.removeTags = opts.removeTags;
 
         const result = await client.execute('update_note', payload);
         console.log(
           formatResult(result, format, (data) => {
-            const r = data as Record<string, unknown>;
-            return `Updated note ${r.remId || remId}`;
+            const r = data as { remIds?: string[]; titles?: string[] };
+            const ids = r.remIds || [];
+            const titles = r.titles || [];
+            if (ids.length === 0) return `Updated note ${remId} (no Rems created)`;
+            return titles
+              .map((t, i) => `Updated/Created: ${t || '(untitled)'} (ID: ${ids[i] || 'unknown'})`)
+              .join('\n');
           })
         );
       } catch (error) {

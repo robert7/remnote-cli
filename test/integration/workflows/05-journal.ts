@@ -26,7 +26,7 @@ async function withTempContentFile<T>(
 
 export async function journalWorkflow(
   ctx: WorkflowContext,
-  _state: SharedState
+  state: SharedState
 ): Promise<WorkflowResult> {
   const steps: StepResult[] = [];
 
@@ -42,7 +42,8 @@ export async function journalWorkflow(
             unknown
           >
       )) as Record<string, unknown>;
-      assertHasField(result, 'remId', 'journal append with timestamp');
+      assertHasField(result, 'remIds', 'journal append with timestamp');
+      state.journalEntryAId = (result.remIds as string[])[0];
       steps.push({ label: 'Append with timestamp', passed: true, durationMs: Date.now() - start });
     } catch (e) {
       steps.push({
@@ -68,7 +69,8 @@ export async function journalWorkflow(
             '--no-timestamp',
           ])) as Record<string, unknown>
       )) as Record<string, unknown>;
-      assertHasField(result, 'remId', 'journal append without timestamp');
+      assertHasField(result, 'remIds', 'journal append without timestamp');
+      state.journalEntryBId = (result.remIds as string[])[0];
       steps.push({
         label: 'Append without timestamp',
         passed: true,
@@ -77,6 +79,36 @@ export async function journalWorkflow(
     } catch (e) {
       steps.push({
         label: 'Append without timestamp',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 3: Append with markdown content
+  {
+    const start = Date.now();
+    try {
+      const result = (await withTempContentFile(
+        `[CLI-TEST] Markdown entry ${ctx.runId}\n\n## Section\n- Item 1\n- Item 2`,
+        async (contentPath) =>
+          (await ctx.cli.runExpectSuccess([
+            'journal',
+            '--content-file',
+            contentPath,
+          ])) as Record<string, unknown>
+      )) as Record<string, unknown>;
+      assertHasField(result, 'remIds', 'journal append with markdown');
+      state.journalEntryCId = (result.remIds as string[])[0];
+      steps.push({
+        label: 'Append with markdown',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Append with markdown',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,

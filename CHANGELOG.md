@@ -4,7 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- Added support for hierarchical markdown trees in `create` (`--content`, `--content-file`), `update` (`--append`, `--replace`) and `journal` (`--content`).
+  - Flashcards could be created using RemNote markdown syntax (e.g., `::`, `;;`, `>>`) within the `content`.
+  - Shell-safe signature in: `create [title] [options]`. Content must be provided via `--content` / `-c` or `--content-file`.
+
 ### Changed
+- Updated mutating bridge actions (`create_note`, `update_note`, `append_journal`) and CLI commands to return plural `remIds` and `titles` arrays for consistent multi-Rem support.
+- Updated `remnote_create_note` input schema:
+  - Made `title` optional
+  - At least one of `title` or `content` must be provided.
+- Refined tag application rules with hierarchical markdown: tags are only applied to the created root or top-level Rems, not to all nested descendants.
+- Improved CLI robustness by implementing "argument shifting" detection in `create`, `update`, and `journal` commands. This prevents the shell from incorrectly swallowing global or local flags as option values when arguments (like empty strings) are missing.
 
 - Renamed the local OpenClaw skill package directory to `skills/` and updated live repository references, including
   the ClawHub upload script path.

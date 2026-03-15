@@ -81,8 +81,8 @@ If any precondition is missing, stop and fix setup first.
   - `--content-file <path|->` for `create` / `journal`
   - `--append-file <path|->` or `--replace-file <path|->` for `update`
 - Keep executed command strings short and predictable for OpenClaw allowlisting.
-- Inline `--content` / `--append` and positional `journal [content]` are discouraged except for very short single-line
-  text.
+- Inline `--content` / `--append`/positional `journal [content]`/positional `create [title]` are discouraged except for very short single-line text.
+- With markdown syntax input, all options must use flags to prevent misinterpretation of the content as command options.
 - `-` (stdin) is supported but discouraged by default in OpenClaw flows because command context can be less explicit.
 
 ## Compatibility Check (mandatory before real work)
@@ -147,8 +147,9 @@ If any precondition is missing, stop and fix setup first.
 - Update replace (destructive, preferred only with explicit user intent):
   - `remnote-cli update <rem-id> --replace-file /tmp/replacement.md --text`
   - `remnote-cli update <rem-id> --replace "" --text` (clear all direct children)
-- Journal (preferred): `remnote-cli journal --content-file /tmp/entry.md --text`
-- Fallbacks (discouraged): inline flags or positional `journal [content]` for short single-line text only.
+- Journal: `remnote-cli journal "Finished task" --text`
+- Journal (from file): `remnote-cli journal --content-file /tmp/entry.md --text`
+- Fallbacks (discouraged): inline flags for short single-line text only.
 - Safety:
   - Never combine append and replace flags in one command.
   - Run replace only when `acceptWriteOperations=true` and `acceptReplaceOperation=true` from `status`.

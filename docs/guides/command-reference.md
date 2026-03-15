@@ -33,6 +33,15 @@ the RemNote Automation Bridge plugin connected to the daemon.
 - JSON is the default when no output flag is provided.
 - If both `--json` and `--text` are passed, `--text` wins.
 
+### Argument Quoting and Shifting
+
+CLI environments (especially Windows shells) can sometimes "swallow" empty strings or misinterpret arguments if quoting is missing. This can lead to **argument shifting**, where a flag (like `--content`) is incorrectly interpreted as the *value* for a preceding option (like `--title`).
+
+To prevent this:
+1. **Always quote** text values that contain spaces or special characters.
+2. **Use explicit equality** for potentially empty values: `--title=""`.
+3. `remnote-cli` includes **shifting detection**: if an option value matches a registered global or local flag, the command will fail early with an error message to prevent accidental mis-execution.
+
 ## Exit Codes
 
 | Code | Meaning |
@@ -122,32 +131,54 @@ remnote-cli --text daemon status
 
 ## create
 
-Create a new RemNote note.
+Create a new RemNote note or a hierarchical tree.
 
 ```bash
-remnote-cli create <title> [options]
+remnote-cli create [title] [options]
 ```
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `-c, --content <text>` | none | Initial content |
+| `--title <text>` | none | Note title |
+| `-c, --content <text>` | none | Initial content (markdown supported) |
 | `--content-file <path>` | none | Read initial content from UTF-8 file (`-` for stdin) |
 | `--parent-id <id>` | none | Parent Rem ID |
 | `-t, --tags <tag...>` | none | One or more tags |
 
 Behavior rules:
 
+- `title` and `content` are both optional, but **at least one must be provided**.
+- Title input support positional `[title]` (backward-compatible) and `--title <text>`.
+- Content input from `-c`/`--content`/`--content-file` supports RemNote's native markdown syntax for creating nested hierarchies and flashcards inline.
 - `--content` and `--content-file` are mutually exclusive.
 - Content loaded from file/stdin is passed verbatim (no templating/interpolation).
 - Write content from `--content-file`/`--append-file`/`--replace-file`/stdin is capped at 100 KB.
+- If `parent-id` is not provided, the note will be created under the default root rem in the setting.
+- Tags are applied only to the top-level Rems created.
 
 Examples:
 
 ```bash
+# Simple note with title only, either by positional argument or --title option, create under default root rem
 remnote-cli create "Meeting Notes"
-remnote-cli create "Project Plan" --content "Phase 1" --tags planning work --text
-remnote-cli create "Weekly Summary" --content-file /tmp/weekly-summary.md --text
-cat /tmp/weekly-summary.md | remnote-cli create "Weekly Summary" --content-file - --text
+remnote-cli create --title "Meeting Notes"
+
+# Create a new note under a specific parent rem id
+remnote-cli create --title "Meeting Notes" --parent-id <parent-rem-id>
+
+# Create a new note with title and content
+remnote-cli create --title "Project Plan" --content "Phase 1" --tags planning work
+
+# Create a new note with markdown content directly under parent rem id
+# Note: if the content is in markdown format, --content/--content-file must be used to avoid misinterpretation of the content as command options
+remnote-cli create --content "- Item 1\n  - Item 2" --parent-id <parent-rem-id>
+
+# Flashcards
+remnote-cli create --title "Photosynthesis" --content "Front :: Back"
+
+# Hierarchical tree from file or from parsed markdown
+remnote-cli create --title "Biology Terms" --content-file /tmp/biology.md
+remnote-cli create --title "Biology Terms" --content "# Terms 1\n- Item 1\n  - Item 2"
 ```
 
 ## search
@@ -252,6 +283,7 @@ Behavior rules:
 
 - Options can be combined in one call (title/content/tag updates in one request).
 - At least one update field should be provided.
+- Input from `--append`/`--append-file`/`--replace`/`--replace-file` supports RemNote's native markdown syntax for creating nested hierarchies and flashcards inline.
 - `--append` and `--append-file` are mutually exclusive.
 - `--replace` and `--replace-file` are mutually exclusive.
 - Append and replace are mutually exclusive in a single command:
@@ -294,6 +326,7 @@ Behavior rules:
   - positional `[content]` (backward-compatible)
   - `--content <text>`
   - `--content-file <path|->`
+- Content input from `--content`/`--content-file` supports RemNote's native markdown syntax for creating nested hierarchies and flashcards inline.
 
 Examples:
 
