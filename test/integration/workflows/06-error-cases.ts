@@ -139,5 +139,92 @@ export async function errorCasesWorkflow(
     }
   }
 
+  // Step 6: Create detects argument shifting in options
+  {
+    const start = Date.now();
+    try {
+      // Missing value for --title causes it to swallow --content
+      const result = await ctx.cli.runExpectError(['create', '--title', '--content', 'Body']);
+      assertTruthy(result.exitCode !== 0, 'should have non-zero exit code');
+      assertContains(
+        result.stderr,
+        'looks like a flag but was passed as an option value',
+        'stderr should explain option shifting'
+      );
+      steps.push({
+        label: 'Create detects option shifting',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Create detects option shifting',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 7: Update detects argument shifting in options
+  {
+    const start = Date.now();
+    try {
+      // Missing value for --title causes it to swallow --append
+      const result = await ctx.cli.runExpectError([
+        'update',
+        'abc123',
+        '--title',
+        '--append',
+        'More text',
+      ]);
+      assertTruthy(result.exitCode !== 0, 'should have non-zero exit code');
+      assertContains(
+        result.stderr,
+        'looks like a flag but was passed as an option value',
+        'stderr should mention option shifting'
+      );
+      steps.push({
+        label: 'Update detects option shifting',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Update detects option shifting',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 8: Journal detects argument shifting in options
+  {
+    const start = Date.now();
+    try {
+      // Missing value for --content causes it to swallow --no-timestamp
+      const result = await ctx.cli.runExpectError(['journal', '--content', '--no-timestamp']);
+      assertTruthy(result.exitCode !== 0, 'should have non-zero exit code');
+      assertContains(
+        result.stderr,
+        'looks like a flag but was passed as an option value',
+        'stderr should mention option shifting'
+      );
+      steps.push({
+        label: 'Journal detects option shifting',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Journal detects option shifting',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
   return { name: 'Error Cases', steps, skipped: false };
 }
