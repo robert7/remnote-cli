@@ -69,3 +69,21 @@ rm ~/.remnote-cli/daemon.pid
 
 **Cause:** The bridge plugin received the request but didn't respond in time. This can happen if RemNote is
 busy or the plugin encountered an error. Check RemNote's developer console for plugin errors.
+
+## Argument Shifting / Flag Swallowing
+
+**Symptom:** Command fails with `looks like a flag but was passed as an option value` or `Argument shifting detected`.
+
+**Cause:** The shell misinterpreted your command, likely because an empty string or a missing value caused the *next* flag to be consumed as the value for the *current* option.
+
+Example of problematic syntax:
+```bash
+# This may fail if the shell treats --content as the value for --title
+remnote-cli create --title --content "Note body"
+```
+
+**Fix:** Ensure every option that expects a value has one. Use explicit equality syntax to force empty values or avoid ambiguity:
+```bash
+# Explicit empty title
+remnote-cli create --title="" --content "Note body"
+```

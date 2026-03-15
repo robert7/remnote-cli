@@ -33,6 +33,15 @@ the RemNote Automation Bridge plugin connected to the daemon.
 - JSON is the default when no output flag is provided.
 - If both `--json` and `--text` are passed, `--text` wins.
 
+### Argument Quoting and Shifting
+
+CLI environments (especially Windows shells) can sometimes "swallow" empty strings or misinterpret arguments if quoting is missing. This can lead to **argument shifting**, where a flag (like `--content`) is incorrectly interpreted as the *value* for a preceding option (like `--title`).
+
+To prevent this:
+1. **Always quote** text values that contain spaces or special characters.
+2. **Use explicit equality** for potentially empty values: `--title=""`.
+3. `remnote-cli` includes **shifting detection**: if an option value matches a registered global or local flag, the command will fail early with an error message to prevent accidental mis-execution.
+
 ## Exit Codes
 
 | Code | Meaning |

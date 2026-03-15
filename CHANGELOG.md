@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
   - Made `title` optional
   - At least one of `title` or `content` must be provided.
 - Refined tag application rules with hierarchical markdown: tags are only applied to the created root or top-level Rems, not to all nested descendants.
+- Improved CLI robustness by implementing "argument shifting" detection in `create`, `update`, and `journal` commands. This prevents the shell from incorrectly swallowing global or local flags as option values when arguments (like empty strings) are missing.
 
 - Renamed the local OpenClaw skill package directory to `skills/` and updated live repository references, including
   the ClawHub upload script path.
