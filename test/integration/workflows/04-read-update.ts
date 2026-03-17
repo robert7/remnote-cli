@@ -24,6 +24,50 @@ function summarizeReadResult(result: Record<string, unknown>): Record<string, un
   };
 }
 
+async function resolveExpectedSearchByTagTarget(
+  ctx: WorkflowContext,
+  taggedRemId: string
+): Promise<string> {
+  const tagged = (await ctx.cli.runExpectSuccess([
+    'read',
+    taggedRemId,
+    '--include-content',
+    'none',
+  ])) as Record<string, unknown>;
+
+  let currentParentId =
+    typeof tagged.parentRemId === 'string' && tagged.parentRemId.length > 0
+      ? (tagged.parentRemId as string)
+      : undefined;
+  let nearestNonDocumentAncestorId: string | undefined;
+
+  while (currentParentId) {
+    const parent = (await ctx.cli.runExpectSuccess([
+      'read',
+      currentParentId,
+      '--include-content',
+      'none',
+    ])) as Record<string, unknown>;
+
+    const parentRemId = parent.remId as string;
+    const parentRemType = parent.remType as string;
+    if (!nearestNonDocumentAncestorId) {
+      nearestNonDocumentAncestorId = parentRemId;
+    }
+
+    if (parentRemType === 'document' || parentRemType === 'dailyDocument') {
+      return parentRemId;
+    }
+
+    currentParentId =
+      typeof parent.parentRemId === 'string' && parent.parentRemId.length > 0
+        ? (parent.parentRemId as string)
+        : undefined;
+  }
+
+  return nearestNonDocumentAncestorId ?? (tagged.remId as string);
+}
+
 async function withTempContentFile<T>(
   content: string,
   fn: (path: string) => Promise<T>
@@ -45,6 +89,7 @@ export async function readUpdateWorkflow(
   const steps: StepResult[] = [];
   const acceptWriteOperations = state.acceptWriteOperations ?? true;
   const acceptReplaceOperation = acceptWriteOperations && (state.acceptReplaceOperation ?? false);
+  const tagVerificationName = `cli-test-added-${ctx.runId.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
   if (
     !state.noteAId ||
@@ -223,13 +268,33 @@ export async function readUpdateWorkflow(
     const start = Date.now();
     try {
       if (acceptWriteOperations) {
+        const expectedTargetRemId = await resolveExpectedSearchByTagTarget(
+          ctx,
+          state.noteBId as string
+        );
         const result = (await ctx.cli.runExpectSuccess([
           'update',
           state.noteBId as string,
           '--add-tags',
-          'cli-test-added',
+          tagVerificationName,
         ])) as Record<string, unknown>;
         assertHasField(result, 'remIds', 'update note B add tags');
+        const taggedSearch = (await ctx.cli.runExpectSuccess([
+          'search-tag',
+          tagVerificationName,
+          '--include-content',
+          'none',
+          '--limit',
+          '10',
+        ])) as Record<string, unknown>;
+        assertHasField(taggedSearch, 'results', 'search-tag after add tags');
+        assertTruthy(
+          Array.isArray(taggedSearch.results),
+          'search-tag after add tags should return results'
+        );
+        const taggedResults = taggedSearch.results as Array<Record<string, unknown>>;
+        const match = taggedResults.find((r) => r.remId === expectedTargetRemId);
+        assertTruthy(match, 'added tag should resolve to the tagged target');
         steps.push({
           label: 'Update note B (add tags)',
           passed: true,
@@ -240,7 +305,7 @@ export async function readUpdateWorkflow(
           'update',
           state.noteBId as string,
           '--add-tags',
-          'cli-test-added',
+          tagVerificationName,
         ]);
         assertContains(
           result.stderr,
@@ -258,6 +323,73 @@ export async function readUpdateWorkflow(
         label: acceptWriteOperations
           ? 'Update note B (add tags)'
           : 'Update note B (add tags) blocked by write gate',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 4b: Update note B — remove tags (or validate write gate rejection)
+  {
+    const start = Date.now();
+    try {
+      if (acceptWriteOperations) {
+        const expectedTargetRemId = await resolveExpectedSearchByTagTarget(
+          ctx,
+          state.noteBId as string
+        );
+        const result = (await ctx.cli.runExpectSuccess([
+          'update',
+          state.noteBId as string,
+          '--remove-tags',
+          tagVerificationName,
+        ])) as Record<string, unknown>;
+        assertHasField(result, 'remIds', 'update note B remove tags');
+        const taggedSearch = (await ctx.cli.runExpectSuccess([
+          'search-tag',
+          tagVerificationName,
+          '--include-content',
+          'none',
+          '--limit',
+          '10',
+        ])) as Record<string, unknown>;
+        assertHasField(taggedSearch, 'results', 'search-tag after remove tags');
+        assertTruthy(
+          Array.isArray(taggedSearch.results),
+          'search-tag after remove tags should return results array'
+        );
+        const taggedResults = taggedSearch.results as Array<Record<string, unknown>>;
+        const match = taggedResults.find((r) => r.remId === expectedTargetRemId);
+        assertTruthy(!match, 'removed tag should no longer resolve to the tagged target');
+        steps.push({
+          label: 'Update note B (remove tags)',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      } else {
+        const result = await ctx.cli.runExpectError([
+          'update',
+          state.noteBId as string,
+          '--remove-tags',
+          tagVerificationName,
+        ]);
+        assertContains(
+          result.stderr,
+          'Write operations are disabled by bridge settings',
+          'remove tags should be blocked when write operations are disabled'
+        );
+        steps.push({
+          label: 'Update note B (remove tags) blocked by write gate',
+          passed: true,
+          durationMs: Date.now() - start,
+        });
+      }
+    } catch (e) {
+      steps.push({
+        label: acceptWriteOperations
+          ? 'Update note B (remove tags)'
+          : 'Update note B (remove tags) blocked by write gate',
         passed: false,
         durationMs: Date.now() - start,
         error: (e as Error).message,

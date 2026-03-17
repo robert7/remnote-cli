@@ -164,6 +164,8 @@ export async function createSearchWorkflow(
   state: SharedState
 ): Promise<WorkflowResult> {
   const steps: StepResult[] = [];
+  const sanitizedRunId = ctx.runId.replace(/[^a-zA-Z0-9]/g, '-');
+  const mdTreeRootOnlyTag = `cli-tree-root-${sanitizedRunId}`;
 
   if (!state.integrationParentRemId) {
     return {
@@ -181,7 +183,7 @@ export async function createSearchWorkflow(
   }
 
   if (!state.searchByTagTag) {
-    state.searchByTagTag = `cli-test-tag-${ctx.runId.replace(/[^a-zA-Z0-9]/g, '-')}`;
+    state.searchByTagTag = `cli-test-tag-${sanitizedRunId}`;
   }
 
   // Step 1: Create simple note (title-only)
@@ -308,6 +310,7 @@ export async function createSearchWorkflow(
           `[CLI-TEST] Flashcard Tree ${ctx.runId}`,
           '--tags',
           state.searchByTagTag as string,
+          mdTreeRootOnlyTag,
         ])) as Record<string, unknown>;
       })) as Record<string, unknown>;
 
@@ -410,7 +413,59 @@ export async function createSearchWorkflow(
     }
   }
 
-  // Step 9-11: Search by tag with includeContent modes
+  // Step 9: Root-only markdown tree tag does not bleed to descendants
+  {
+    const start = Date.now();
+    let debugResults: Array<Record<string, unknown>> | null = null;
+    try {
+      assertTruthy(
+        typeof state.mdTreeIds?.[0] === 'string',
+        'md tree root remId should be recorded'
+      );
+      const expectedTarget = await resolveExpectedSearchByTagTarget(
+        ctx,
+        state.mdTreeIds[0] as string
+      );
+      const result = (await ctx.cli.runExpectSuccess([
+        'search-tag',
+        mdTreeRootOnlyTag,
+        '--include-content',
+        'none',
+        '--limit',
+        '10',
+      ])) as Record<string, unknown>;
+      assertHasField(result, 'results', 'search-tag markdown tree root-only tag');
+      assertIsArray(result.results, 'search-tag markdown tree root-only tag results');
+      const results = result.results as Array<Record<string, unknown>>;
+      debugResults = results;
+      assertEqual(
+        results.length,
+        1,
+        'root-only markdown tree tag should resolve to exactly one target'
+      );
+      findMatchingSearchResult(results, expectedTarget.remId);
+      steps.push({
+        label: 'Root-only markdown tree tag excludes descendants',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Root-only markdown tree tag excludes descendants',
+        passed: false,
+        durationMs: Date.now() - start,
+        error:
+          `${(e as Error).message} | tag=${JSON.stringify(mdTreeRootOnlyTag)}` +
+          (debugResults
+            ? ` resultCount=${debugResults.length} topResults=${JSON.stringify(
+                summarizeSearchResults(debugResults)
+              )}`
+            : ''),
+      });
+    }
+  }
+
+  // Step 10-12: Search by tag with includeContent modes
   let expectedTagTarget: ExpectedTagTarget | undefined;
   {
     const start = Date.now();
