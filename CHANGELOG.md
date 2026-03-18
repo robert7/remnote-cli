@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-03-18
+
 ### Documentation
 
 - Updated `README.md` command summaries and examples to reflect hierarchical markdown and flashcard creation.
