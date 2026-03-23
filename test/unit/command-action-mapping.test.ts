@@ -298,7 +298,12 @@ describe('command bridge action mapping', () => {
   });
 
   it('maps read-table command with --properties filter', async () => {
-    const executeSpy = await runCommand(['read-table', 'My Table', '--properties', 'Status,Priority']);
+    const executeSpy = await runCommand([
+      'read-table',
+      'My Table',
+      '--properties',
+      'Status,Priority',
+    ]);
     expect(executeSpy).toHaveBeenCalledWith('read_table', {
       tableNameOrId: 'My Table',
       limit: 50,

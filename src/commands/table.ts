@@ -40,7 +40,7 @@ export function registerReadTableCommand(program: Command): void {
             // Columns
             const columns = (r.columns || []) as Array<Record<string, string>>;
             if (columns.length > 0) {
-              lines.push(`Columns: ${columns.map(c => `${c.name} (${c.type})`).join(', ')}`);
+              lines.push(`Columns: ${columns.map((c) => `${c.name} (${c.type})`).join(', ')}`);
             }
 
             // Row count
@@ -51,15 +51,15 @@ export function registerReadTableCommand(program: Command): void {
             if (rows.length > 0 && columns.length > 0) {
               lines.push('');
               // Header row
-              const colNames = ['Name', ...columns.map(c => c.name)];
+              const colNames = ['Name', ...columns.map((c) => c.name)];
               lines.push(colNames.join(' | '));
-              lines.push(colNames.map(n => '─'.repeat(n.length)).join('─┼─'));
+              lines.push(colNames.map((n) => '─'.repeat(n.length)).join('─┼─'));
               // Data rows
               for (const row of rows) {
                 const values = (row.values || {}) as Record<string, string>;
                 const cells = [
                   String(row.name || ''),
-                  ...columns.map(c => values[c.propertyId] || ''),
+                  ...columns.map((c) => values[c.propertyId] || ''),
                 ];
                 lines.push(cells.join(' | '));
               }
