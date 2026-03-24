@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
   enabled for current scripts.
 - Migrated the repo to `eslint.config.mjs` flat config and aligned runtime and local tooling on Node 20.19.0 via
   package metadata, `.nvmrc`, and `node-check.sh`.
-- Pinned the shared GitHub Actions CI workflow to `robert7/workflows/.github/workflows/node-ci.yml@v0.1.0`.
+- Pinned the shared GitHub Actions CI workflow to `robert7/workflows/.github/workflows/node-ci.yml@v0.2.0`.
 - Fixed flaky WebSocket/daemon tests in CI by switching them to OS-assigned ephemeral ports instead of probing a free
   port and re-binding it later.
 
