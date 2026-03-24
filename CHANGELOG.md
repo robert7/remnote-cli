@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 - Moved GitHub Actions CI to the shared reusable workflow in `robert7/workflows`, keeping local `main` push and pull
   request triggers while centralizing the job definition.
+- Upgraded the lint toolchain to ESLint 9.x and `typescript-eslint` 8.x while keeping the existing `.eslintrc` flow
+  enabled for current scripts.
 
 
 ### Documentation
