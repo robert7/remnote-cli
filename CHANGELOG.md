@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Moved GitHub Actions CI to the shared reusable workflow in `robert7/workflows`, keeping local `main` push and pull
+  request triggers while centralizing the job definition.
+
+
 ### Documentation
 
 - Refreshed `skills/remnote/SKILL.md` to use the current bridge connection lifecycle for troubleshooting, including
