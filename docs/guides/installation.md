@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Node.js 18+** — required for built-in `fetch()` support
+- **Node.js 20.19.0+**
 - **RemNote** desktop app with the [RemNote Automation Bridge plugin](https://github.com/robert7/remnote-mcp-bridge) installed
 
 ## Install from npm

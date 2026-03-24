@@ -20,7 +20,7 @@ The daemon exposes `http://127.0.0.1:3100` for CLI→daemon communication.
 
 - **Cross-platform:** Works identically on macOS, Linux, and Windows. Unix sockets require platform-specific paths.
 - **Debuggable:** `curl http://127.0.0.1:3100/health` works out of the box.
-- **Zero dependencies:** Node 18+ includes `fetch()` and `node:http`. No IPC libraries needed.
+- **Zero dependencies:** Node 20.19+ includes `fetch()` and `node:http`. No IPC libraries needed.
 - **Familiar:** HTTP request/response semantics map directly to command/result.
 
 ## Process Model

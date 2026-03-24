@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
   request triggers while centralizing the job definition.
 - Upgraded the lint toolchain to ESLint 9.x and `typescript-eslint` 8.x while keeping the existing `.eslintrc` flow
   enabled for current scripts.
+- Migrated the repo to `eslint.config.mjs` flat config and aligned runtime and local tooling on Node 20.19.0 via
+  package metadata, `.nvmrc`, and `node-check.sh`.
 
 
 ### Documentation

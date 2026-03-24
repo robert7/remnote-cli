@@ -19,8 +19,8 @@
     "test:coverage": "vitest run --coverage",
     "test:integration": "tsx test/integration/run-integration.ts",
     "test:ui": "vitest --ui",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint src test --ext .ts",
-    "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint src test --ext .ts --fix",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "quality": "./code-quality.sh",
@@ -70,6 +70,6 @@
     "vitest": "^1.6.1"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.19.0"
   }
 }

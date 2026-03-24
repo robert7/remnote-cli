@@ -8,6 +8,9 @@ cd remnote-cli
 source ./node-check.sh && npm install
 ```
 
+Use Node.js 20.19.0+ for local development and runtime. The repo's `.nvmrc` and `node-check.sh` are aligned to that
+floor, and `node-check.sh` will accept newer installed Node versions when they still satisfy it.
+
 > If you are testing against an existing bridge plugin install, match your local CLI checkout/version to the bridge plugin version line (`0.x` semver). See the [Bridge / Consumer Version Compatibility Guide](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/guides/bridge-consumer-version-compatibility.md).
 
 ## Development Commands

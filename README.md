@@ -126,7 +126,7 @@ remnote-cli daemon stop
 
 ## Prerequisites
 
-- Node.js >= 18
+- Node.js >= 20.19.0
 - RemNote desktop app with the [RemNote Automation Bridge plugin](https://github.com/robert7/remnote-mcp-bridge) installed and enabled
 
 ## Troubleshooting
