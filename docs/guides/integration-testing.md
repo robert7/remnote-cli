@@ -61,3 +61,40 @@ When reusing a title-only hit, integration setup backfills the anchor tag for fu
 
 Uniqueness is enforced: if more than one exact anchor-title match exists, the integration run fails immediately and
 prints duplicate `remId`s so you can clean up test data in RemNote.
+
+---
+
+## Testing read-table
+
+The read-table integration test (workflow 07) requires an Advanced Table in RemNote to be pre-configured. This allows
+testing the table reading functionality without needing write operations.
+
+### Setup
+
+1. Create an Advanced Table in RemNote with some data (at least one column and one row)
+2. Find the table's name exactly as it appears in RemNote
+3. Create or edit the config file at:
+
+   **Windows:** `C:\Users\<your-username>\.remnote-mcp-bridge\remnote-mcp-bridge.json`
+
+   **macOS/Linux:** `~/.remnote-mcp-bridge/remnote-mcp-bridge.json`
+
+4. Add the integration test configuration:
+
+```json
+{
+  "integrationTest": {
+    "tableName": "Your Table Name"
+  }
+}
+```
+
+### Running
+
+After setting up the config, run the integration tests as usual:
+
+```bash
+npm run test:integration
+```
+
+The read-table workflow will be skipped with a warning if the config is missing or invalid.
