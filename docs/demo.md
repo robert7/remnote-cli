@@ -13,6 +13,14 @@ agent-to-CLI orchestration, quick status verification, and transparent handling 
 Note: reading a full REM with complete children content is not available yet via the bridge. This needs improvement in
 [RemNote Automation Bridge plugin](https://github.com/robert7/remnote-mcp-bridge).
 
+### OpenClaw YouTube Summary Saved to RemNote Journal
+
+![OpenClaw creating a YouTube summary and saving it to RemNote journal](images/remnote-cli-demo-journal-summary.jpg)
+
+This screenshot shows OpenClaw working through a Discord interface to create a YouTube video summary and store the result as
+a **RemNote journal entry**. The summary content itself was generated with [summarize.sh](https://summarize.sh/) before
+being passed into RemNote through the OpenClaw workflow.
+
 ## CLI Startup, Connection, and Search
 
 ![remnote-cli demo](images/remnote-cli-demo-1.jpg)
@@ -30,4 +38,3 @@ What this demonstrates:
 - Daemon startup and plugin connection are separate states.
 - JSON-first output is useful for automation and agent workflows.
 - `status` and `status --text` are quick diagnostics when search/create calls fail.
-

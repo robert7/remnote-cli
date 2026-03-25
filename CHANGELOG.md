@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
   as `--control-port`, tag updates, journal timestamp control, and argument-shifting safeguards.
 - Updated `docs/guides/troubleshooting.md` to match the current bridge lifecycle, clarifying automatic reconnect,
   optional sidebar usage, panel status meanings, wake-up triggers, and post-upgrade daemon restart steps.
+- Expanded `docs/demo.md` with a Discord/OpenClaw screenshot showing a YouTube summary workflow saved into a RemNote
+  journal entry.
 
 ## [0.10.0] - 2026-03-18
 
