@@ -6,20 +6,21 @@ Demonstration of `remnote-cli` against a live RemNote + RemNote Automation Bridg
 
 ![remnote-cli with OpenClaw](images/remnote-cli-openclaw-1.jpg)
 
-This screenshot shows OpenClaw driving `remnote-cli` from a WhatsApp chat: it checks bridge connectivity, runs a
+This screenshot shows [OpenClaw](https://github.com/openclaw/openclaw) driving 
+`remnote-cli` from a WhatsApp chat: it checks bridge connectivity, runs a
 `search` for "blue light", returns matching note IDs, and then attempts a `read`-based summary. The flow highlights
 agent-to-CLI orchestration, quick status verification, and transparent handling when note content is incomplete.
-
-Note: reading a full REM with complete children content is not available yet via the bridge. This needs improvement in
-[RemNote Automation Bridge plugin](https://github.com/robert7/remnote-mcp-bridge).
 
 ### OpenClaw YouTube Summary Saved to RemNote Journal
 
 ![OpenClaw creating a YouTube summary and saving it to RemNote journal](images/remnote-cli-demo-journal-summary.jpg)
 
-This screenshot shows OpenClaw working through a Discord interface to create a YouTube video summary and store the result as
+This screenshot shows [OpenClaw](https://github.com/openclaw/openclaw)
+working through a Discord interface to create a YouTube video summary and store the result as
 a **RemNote journal entry**. The summary content itself was generated with [summarize.sh](https://summarize.sh/) before
 being passed into RemNote through the OpenClaw workflow.
+
+Command: `remnote-cli journal --content-file summarize-output-n1e9-med.md --no-timestamp`
 
 ## CLI Startup, Connection, and Search
 
