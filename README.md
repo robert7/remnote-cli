@@ -89,6 +89,8 @@ remnote-cli daemon stop
 - **[Development Setup](docs/guides/development-setup.md)** - Local setup, workflows, and quality checks
 - **[Integration Testing](docs/guides/integration-testing.md)** - End-to-end testing against live RemNote
 
+Pull requests that affect bridge-consumer behavior should follow the shared PR rules in the bridge repo: [Pull Request Guide](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/guides/pull-request-guide.md). In particular, keep bridge/server/CLI parity for shared functionality changes and link related PRs across the affected repos.
+
 ## Commands
 
 | Command | Description |
