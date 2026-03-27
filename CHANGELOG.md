@@ -30,6 +30,8 @@ All notable changes to this project will be documented in this file.
 - Tightened read-table integration coverage to validate filtering, deterministic error handling, and Rem-ID
   lookup.
 - Improved read-table integration diagnostics so Rem-ID validation reports independently from name-lookup failures.
+- Hardened `run-agent-integration-test.sh` to source `node-check.sh`, build the CLI before daemon control commands, and
+  surface daemon-log context when startup fails.
 
 ### Documentation
 
@@ -45,6 +47,8 @@ All notable changes to this project will be documented in this file.
 - Expanded `docs/demo.md` with a Discord/OpenClaw screenshot showing a YouTube summary workflow saved into a RemNote
   journal entry.
 - Replaced the blanket agent ban in integration-test policy docs with the guarded wrapper flow for explicit human-requested live runs.
+- Clarified that agent-assisted live runs still require the human collaborator to start the bridge first and restart it
+  after bridge-code changes before reruns.
 
 ## [0.10.0] - 2026-03-18
 

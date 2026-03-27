@@ -25,6 +25,9 @@ real content in RemNote, prefixed with `[CLI-TEST]` for easy cleanup.
 ./run-agent-integration-test.sh --yes
 ```
 
+For agent-assisted runs, the human collaborator must still start the bridge first. If bridge code changed since the
+current RemNote bridge session started, the agent should ask for a bridge restart before rerunning the suite.
+
 Or directly:
 
 ```bash

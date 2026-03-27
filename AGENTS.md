@@ -80,6 +80,9 @@ wrapper.
 
 - Default: do not run `npm run test:integration` or `./run-integration-test.sh` directly.
 - Allowed path for AI agents: `./run-agent-integration-test.sh [--yes]`
+- Before invoking the wrapper, the agent must ask the human collaborator to start the bridge in RemNote.
+- If bridge code changed after the currently running RemNote bridge session started, the agent must ask the human
+  collaborator to restart the bridge before rerunning the suite.
 - The wrapper may start the local CLI daemon if it is not already running, then waits for `daemon status` to report
   `wsConnected === true` before launching the suite.
 - If the bridge never connects, the wrapper must stop and tell the human collaborator to verify the RemNote bridge
