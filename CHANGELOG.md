@@ -49,6 +49,8 @@ All notable changes to this project will be documented in this file.
 - Replaced the blanket agent ban in integration-test policy docs with the guarded wrapper flow for explicit human-requested live runs.
 - Clarified that agent-assisted live runs still require the human collaborator to start the bridge first and restart it
   after bridge-code changes before reruns.
+- Clarified that switching from MCP server live integration tests to CLI live integration tests requires the MCP server
+  to be stopped first.
 
 ## [0.10.0] - 2026-03-18
 

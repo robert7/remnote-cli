@@ -27,6 +27,8 @@ real content in RemNote, prefixed with `[CLI-TEST]` for easy cleanup.
 
 For agent-assisted runs, the human collaborator must still start the bridge first. If bridge code changed since the
 current RemNote bridge session started, the agent should ask for a bridge restart before rerunning the suite.
+When switching from the MCP server suite to the CLI suite, stop the MCP server first so the CLI daemon can bind the
+shared WebSocket port.
 
 Or directly:
 
