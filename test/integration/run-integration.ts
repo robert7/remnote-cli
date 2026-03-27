@@ -95,7 +95,8 @@ function printWorkflowResult(index: number, result: WorkflowResult): void {
 }
 
 function printSummary(results: WorkflowResult[], totalDurationMs: number): void {
-  const totalWorkflows = results.length;
+  const skippedWorkflows = results.filter((r) => r.skipped).length;
+  const totalWorkflows = results.length - skippedWorkflows;
   const passedWorkflows = results.filter(
     (r) => !r.skipped && r.steps.every((s) => s.passed)
   ).length;
@@ -107,7 +108,7 @@ function printSummary(results: WorkflowResult[], totalDurationMs: number): void 
 
   console.log(`\n${BOLD}═══ Summary ═══${RESET}`);
   console.log(
-    `${color}${passedWorkflows}/${totalWorkflows} workflows passed (${passedSteps}/${totalSteps} steps)${RESET}`
+    `${color}${passedWorkflows}/${totalWorkflows} workflows passed (${passedSteps}/${totalSteps} steps, ${skippedWorkflows} skipped)${RESET}`
   );
   console.log(`Duration: ${(totalDurationMs / 1000).toFixed(1)}s`);
 

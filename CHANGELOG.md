@@ -9,6 +9,12 @@ All notable changes to this project will be documented in this file.
 - Options: `--limit`, `--offset`, `--properties` (comma-separated column filter)
 - Human-readable text output with ASCII table formatting
 
+### Fixed
+- Fixed read-table integration config loading to use `~/.remnote-mcp-bridge/remnote-mcp-bridge.json`, while still
+  accepting the older flat-file path as a fallback.
+- Tightened read-table integration coverage to validate filtering, deterministic error handling, and optional Rem-ID
+  lookup.
+
 ### Documentation
 
 - Refreshed `skills/remnote/SKILL.md` to use the current bridge connection lifecycle for troubleshooting, including
@@ -16,6 +22,7 @@ All notable changes to this project will be documented in this file.
   as `--control-port`, tag updates, journal timestamp control, and argument-shifting safeguards.
 - Updated `docs/guides/troubleshooting.md` to match the current bridge lifecycle, clarifying automatic reconnect,
   optional sidebar usage, panel status meanings, wake-up triggers, and post-upgrade daemon restart steps.
+- Documented `read-table` in the README and command/integration guides, including the preferred table test config.
 
 ## [0.10.0] - 2026-03-18
 

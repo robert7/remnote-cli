@@ -261,6 +261,36 @@ remnote-cli read abc123def --include-content none --depth 2 --child-limit 30 --m
 remnote-cli read abc123def --include-content structured --depth 2 --child-limit 30
 ```
 
+## read-table
+
+Read one Advanced Table by table name or Rem ID.
+
+```bash
+remnote-cli read-table <table-name-or-id> [options]
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-l, --limit <n>` | `50` | Maximum rows to return |
+| `--offset <n>` | `0` | Zero-based row offset |
+| `-p, --properties <names>` | none | Comma-separated property names to include |
+
+Behavior rules:
+
+- Accepts either the visible table name or the table Rem ID.
+- JSON output includes `tableId`, `tableName`, `columns`, `rows`, `totalRows`, and `rowsReturned`.
+- In `--text` mode, output prints table identity, column schema, and a simple row grid.
+- `--properties` filters returned columns by property name before rows are formatted.
+- Use `--limit` and `--offset` together for incremental reads of large tables.
+
+Examples:
+
+```bash
+remnote-cli read-table "Projects"
+remnote-cli read-table abc123def --limit 10
+remnote-cli read-table "Projects" --properties "Status,Owner" --text
+```
+
 ## update
 
 Update an existing note.

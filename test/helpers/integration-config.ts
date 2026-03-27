@@ -12,14 +12,18 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-const CONFIG_FILE = '.remnote-mcp-bridge.json';
+const CONFIG_DIR = '.remnote-mcp-bridge';
+const CONFIG_FILE = 'remnote-mcp-bridge.json';
+const LEGACY_CONFIG_FILE = '.remnote-mcp-bridge.json';
 
 /** Config structure for integration tests. */
 export interface IntegrationTestConfig {
-  /** Table Rem ID or tag name for MCP server read_table integration tests */
-  tableNameOrId?: string;
-  /** Table name for CLI read-table integration tests */
+  /** Preferred table Rem ID for deterministic read-table lookup coverage. */
+  tableRemId?: string;
+  /** Preferred table name for read-table name-lookup coverage. */
   tableName?: string;
+  /** Backward-compatible fallback: table Rem ID or tag name for read-table tests. */
+  tableNameOrId?: string;
 }
 
 /** Root config structure matching the JSON file schema. */
@@ -31,7 +35,7 @@ export interface RemnoteMcpBridgeConfig {
  * Get the path to the config file in the user's home directory.
  */
 export function getConfigPath(): string {
-  return path.join(os.homedir(), CONFIG_FILE);
+  return path.join(os.homedir(), CONFIG_DIR, CONFIG_FILE);
 }
 
 /**
@@ -39,19 +43,22 @@ export function getConfigPath(): string {
  * Returns null if the file doesn't exist or is invalid JSON.
  */
 export function loadConfig(): RemnoteMcpBridgeConfig | null {
-  const configPath = getConfigPath();
+  const candidatePaths = [getConfigPath(), path.join(os.homedir(), LEGACY_CONFIG_FILE)];
 
-  if (!fs.existsSync(configPath)) {
-    return null;
+  for (const configPath of candidatePaths) {
+    if (!fs.existsSync(configPath)) {
+      continue;
+    }
+
+    try {
+      const content = fs.readFileSync(configPath, 'utf-8');
+      return JSON.parse(content) as RemnoteMcpBridgeConfig;
+    } catch {
+      // Keep trying other known config locations before giving up.
+    }
   }
 
-  try {
-    const content = fs.readFileSync(configPath, 'utf-8');
-    return JSON.parse(content) as RemnoteMcpBridgeConfig;
-  } catch {
-    // File exists but couldn't be parsed
-    return null;
-  }
+  return null;
 }
 
 /**
@@ -68,12 +75,12 @@ export function getIntegrationTestConfig(): IntegrationTestConfig | null {
  */
 export function hasTableConfig(): boolean {
   const config = getIntegrationTestConfig();
-  return config?.tableName !== undefined && config.tableName !== '';
+  return Boolean(config?.tableName || config?.tableRemId || config?.tableNameOrId);
 }
 
 /**
  * Get a warning message for when table config is missing.
  */
 export function getTableConfigWarning(): string {
-  return `Integration test table not configured. Set integrationTest.tableName in ${getConfigPath()}`;
+  return `Integration test table not configured. Set integrationTest.tableName and/or integrationTest.tableRemId in ${getConfigPath()}`;
 }

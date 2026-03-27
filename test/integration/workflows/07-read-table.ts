@@ -6,9 +6,10 @@
  *
  * Prerequisites:
  * - Config file must exist at $HOME/.remnote-mcp-bridge/remnote-mcp-bridge.json
- * - Must contain integrationTest.tableName
+ * - Must contain integrationTest.tableName and/or integrationTest.tableRemId
  */
 
+import { assertContains, assertEqual, assertTruthy } from '../assertions.js';
 import {
   hasTableConfig,
   getIntegrationTestConfig,
@@ -25,7 +26,11 @@ interface CliContext {
 /** Expected structure of read-table JSON output */
 interface ReadTableResponse {
   columns: Array<{ name: string; propertyId: string; type: string }>;
-  rows: Array<{ name: string; remId: string; values: Record<string, string[]> }>;
+  rows: Array<{ name: string; remId: string; values: Record<string, string> }>;
+  tableId: string;
+  tableName: string;
+  totalRows: number;
+  rowsReturned: number;
 }
 
 export async function readTableWorkflow(
@@ -36,28 +41,33 @@ export async function readTableWorkflow(
 
   // Check if table config exists - skip test if not configured
   if (!hasTableConfig()) {
-    const warning = getTableConfigWarning();
-    steps.push({
-      label: 'Table config check',
-      passed: false,
-      durationMs: 0,
-      error: warning,
-    });
     return {
       name: 'Read Table',
-      steps,
-      skipped: false,
+      steps: [{ label: getTableConfigWarning(), passed: true, durationMs: 0 }],
+      skipped: true,
     };
   }
 
   const config = getIntegrationTestConfig()!;
-  const tableName = config.tableName!;
+  const tableName = config.tableName ?? config.tableNameOrId;
+  const tableRemId = config.tableRemId;
+  const primaryIdentifier = tableName ?? tableRemId ?? config.tableNameOrId;
+
+  if (!primaryIdentifier) {
+    return {
+      name: 'Read Table',
+      steps: [{ label: getTableConfigWarning(), passed: true, durationMs: 0 }],
+      skipped: true,
+    };
+  }
+
+  let baseline: ReadTableResponse | null = null;
 
   // Step 1: Basic read-table command
   {
     const start = Date.now();
     try {
-      const result = await ctx.cli.run(['read-table', tableName]);
+      const result = await ctx.cli.run(['read-table', primaryIdentifier]);
 
       if (result.exitCode !== 0) {
         throw new Error(
@@ -65,18 +75,21 @@ export async function readTableWorkflow(
         );
       }
 
-      // Verify JSON output
       const data = result.json as ReadTableResponse;
       if (!data || typeof data !== 'object') {
         throw new Error(`Expected JSON object, got: ${result.stdout}`);
       }
-
-      // Verify columns and rows
       if (!('columns' in data)) {
         throw new Error('Response missing columns field');
       }
       if (!('rows' in data)) {
         throw new Error('Response missing rows field');
+      }
+      if (!('tableId' in data) || !('tableName' in data)) {
+        throw new Error('Response missing table identity fields');
+      }
+      if (!('totalRows' in data) || !('rowsReturned' in data)) {
+        throw new Error('Response missing pagination fields');
       }
 
       if (!Array.isArray(data.columns)) {
@@ -85,7 +98,11 @@ export async function readTableWorkflow(
       if (!Array.isArray(data.rows)) {
         throw new Error('rows should be an array');
       }
+      assertEqual(data.rowsReturned, data.rows.length, 'rowsReturned should match rows length');
+      assertTruthy(data.tableId, 'tableId should not be empty');
+      assertTruthy(data.tableName, 'tableName should not be empty');
 
+      baseline = data;
       steps.push({
         label: `Read table (${data.columns.length} columns, ${data.rows.length} rows)`,
         passed: true,
@@ -101,11 +118,93 @@ export async function readTableWorkflow(
     }
   }
 
-  // Step 2: read-table with --limit option
+  // Step 2: read-table by Rem ID when configured
+  if (tableRemId) {
+    const start = Date.now();
+    try {
+      const result = await ctx.cli.run(['read-table', tableRemId]);
+
+      if (result.exitCode !== 0) {
+        throw new Error(
+          `CLI exited with code ${result.exitCode}: ${result.stderr || result.stdout}`
+        );
+      }
+
+      const data = result.json as ReadTableResponse;
+      if (!baseline) {
+        throw new Error('Baseline response missing before Rem-ID validation');
+      }
+      assertEqual(data.tableId, baseline.tableId, 'Rem-ID lookup should resolve the same table');
+      assertEqual(data.tableName, baseline.tableName, 'Rem-ID lookup should preserve table name');
+
+      steps.push({
+        label: 'Read table by remId',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Read table by remId',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 3: read-table with --properties filter
+  if (baseline && baseline.columns.length > 0) {
+    const start = Date.now();
+    try {
+      const selectedColumn = baseline.columns[0];
+      const result = await ctx.cli.run([
+        'read-table',
+        primaryIdentifier,
+        '--properties',
+        selectedColumn.name,
+      ]);
+
+      if (result.exitCode !== 0) {
+        throw new Error(
+          `CLI exited with code ${result.exitCode}: ${result.stderr || result.stdout}`
+        );
+      }
+
+      const data = result.json as ReadTableResponse;
+      assertEqual(data.columns.length, 1, '--properties should return exactly one column');
+      assertEqual(
+        data.columns[0].name,
+        selectedColumn.name,
+        '--properties should preserve the requested column'
+      );
+      for (const row of data.rows) {
+        const keys = Object.keys(row.values);
+        assertTruthy(
+          keys.length <= 1 && (keys.length === 0 || keys[0] === data.columns[0].propertyId),
+          'filtered row values should only contain the requested column'
+        );
+      }
+
+      steps.push({
+        label: `Read table with --properties ${selectedColumn.name}`,
+        passed: true,
+        durationMs: Date.now() - start,
+      });
+    } catch (e) {
+      steps.push({
+        label: 'Read table with --properties',
+        passed: false,
+        durationMs: Date.now() - start,
+        error: (e as Error).message,
+      });
+    }
+  }
+
+  // Step 4: read-table with --limit option
   {
     const start = Date.now();
     try {
-      const result = await ctx.cli.run(['read-table', tableName, '--limit', '1']);
+      const result = await ctx.cli.run(['read-table', primaryIdentifier, '--limit', '1']);
 
       if (result.exitCode !== 0) {
         throw new Error(
@@ -117,8 +216,9 @@ export async function readTableWorkflow(
       if (!Array.isArray(data.rows)) {
         throw new Error('rows should be an array');
       }
-      if (data.rows.length > 1) {
-        throw new Error(`limit=1 should return at most 1 row, got ${data.rows.length}`);
+      assertTruthy(data.rows.length <= 1, 'limit=1 should return at most 1 row');
+      if (baseline && baseline.totalRows > 0) {
+        assertEqual(data.rowsReturned, 1, 'limit=1 should report one returned row');
       }
 
       steps.push({
@@ -136,11 +236,11 @@ export async function readTableWorkflow(
     }
   }
 
-  // Step 3: read-table with --offset option
+  // Step 5: read-table with --offset option
   {
     const start = Date.now();
     try {
-      const result = await ctx.cli.run(['read-table', tableName, '--offset', '1']);
+      const result = await ctx.cli.run(['read-table', primaryIdentifier, '--offset', '1']);
 
       if (result.exitCode !== 0) {
         throw new Error(
@@ -151,6 +251,12 @@ export async function readTableWorkflow(
       const data = result.json as ReadTableResponse;
       if (!Array.isArray(data.rows)) {
         throw new Error('rows should be an array');
+      }
+      if (baseline && baseline.totalRows > 1 && baseline.rows.length > 1 && data.rows.length > 0) {
+        assertTruthy(
+          data.rows[0].remId !== baseline.rows[0].remId,
+          'offset=1 should advance to a different first row when multiple rows exist'
+        );
       }
 
       steps.push({
@@ -168,37 +274,22 @@ export async function readTableWorkflow(
     }
   }
 
-  // Step 4: read-table with non-existent table
+  // Step 6: read-table with non-existent table
   {
     const start = Date.now();
     try {
-      const result = await ctx.cli.run(['read-table', 'Non-Existent-Table-xyz-123']);
+      const result = await ctx.cli.runExpectError(['read-table', 'Non-Existent-Table-xyz-123']);
+      assertContains(
+        `${result.stderr}\n${result.stdout}`,
+        'Table not found',
+        'invalid table lookup should return a not-found error'
+      );
 
-      // Accept both success (empty results) and error (table not found)
-      // The important thing is the CLI doesn't crash
-      const data = result.json as Record<string, unknown> | null;
-
-      if (result.exitCode === 0 && data) {
-        // Success with possibly empty results
-        if (!('columns' in data) || !('rows' in data)) {
-          throw new Error('Success response should have columns and rows');
-        }
-        steps.push({
-          label: 'Read non-existent table',
-          passed: true,
-          durationMs: Date.now() - start,
-        });
-      } else if (result.exitCode !== 0) {
-        // Error is acceptable for non-existent table
-        steps.push({
-          label: 'Read non-existent table',
-          passed: true,
-          durationMs: Date.now() - start,
-          error: `Expected error (acceptable): ${result.stderr || result.stdout}`,
-        });
-      } else {
-        throw new Error('Unexpected response for non-existent table');
-      }
+      steps.push({
+        label: 'Read non-existent table',
+        passed: true,
+        durationMs: Date.now() - start,
+      });
     } catch (e) {
       steps.push({
         label: 'Read non-existent table',
