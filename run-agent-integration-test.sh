@@ -12,6 +12,8 @@ LOG_FILE="${REMNOTE_AGENT_DAEMON_LOG:-${HOME}/.remnote-cli/daemon.log}"
 started_daemon=0
 deadline=$((SECONDS + WAIT_TIMEOUT_SECONDS))
 built_cli=0
+test_exit_code=0
+cleanup_ran=0
 
 ensure_built_cli() {
   if (( built_cli == 1 )); then
@@ -42,11 +44,40 @@ start_daemon() {
   started_daemon=1
 }
 
+cleanup() {
+  if (( cleanup_ran == 1 )); then
+    return
+  fi
+  cleanup_ran=1
+
+  if (( started_daemon == 0 )); then
+    return
+  fi
+
+  echo "Stopping CLI daemon started by agent wrapper..."
+  if npm run start -- --text daemon stop; then
+    return
+  fi
+
+  echo "CLI daemon stop command did not succeed. Checking for a leftover daemon..."
+  if output="$(daemon_status)"; then
+    if grep -q 'Status: running' <<<"${output}"; then
+      echo "CLI daemon still appears to be running after stop attempt. Log: ${LOG_FILE}"
+    fi
+  fi
+}
+
+trap cleanup EXIT INT TERM
+
 while (( SECONDS < deadline )); do
   if output="$(daemon_status)"; then
     if grep -q 'Bridge connected: true' <<<"${output}"; then
       echo "Bridge connected. Running integration tests..."
-      exec "${SCRIPT_DIR}/run-integration-test.sh" "$@"
+      set +e
+      "${SCRIPT_DIR}/run-integration-test.sh" "$@"
+      test_exit_code=$?
+      set -e
+      exit "${test_exit_code}"
     fi
 
     echo "CLI daemon is up, but the RemNote bridge is not connected yet. Waiting..."

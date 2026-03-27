@@ -26,6 +26,8 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Hardened `run-agent-integration-test.sh` to source `node-check.sh`, build the CLI before daemon control commands, and
   surface daemon-log context when startup fails.
+- Updated `run-agent-integration-test.sh` to stop the CLI daemon it started after agent-assisted integration runs,
+  including successful, failed, and interrupted runs.
 
 ### Documentation
 
