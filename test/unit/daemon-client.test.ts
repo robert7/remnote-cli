@@ -1,7 +1,6 @@
 import { describe, expect, it, afterEach, beforeEach, vi } from 'vitest';
 import { createServer, Server, IncomingMessage, ServerResponse } from 'node:http';
 import { DaemonClient } from '../../src/client/daemon-client.js';
-import { getAvailablePort } from '../helpers/network.js';
 
 const TEST_HOST = '127.0.0.1';
 
@@ -12,7 +11,6 @@ describe('DaemonClient', () => {
   let testPort: number;
 
   beforeEach(async () => {
-    testPort = await getAvailablePort(TEST_HOST);
     requestHandler = (_req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end('{}');
@@ -20,8 +18,14 @@ describe('DaemonClient', () => {
 
     mockServer = createServer((req, res) => requestHandler(req, res));
     await new Promise<void>((resolve) => {
-      mockServer.listen(testPort, TEST_HOST, resolve);
+      mockServer.listen(0, TEST_HOST, resolve);
     });
+
+    const address = mockServer.address();
+    if (!address || typeof address === 'string') {
+      throw new Error('Failed to resolve daemon client test port');
+    }
+    testPort = address.port;
 
     client = new DaemonClient(testPort, TEST_HOST);
   });
@@ -101,7 +105,27 @@ describe('DaemonClient', () => {
 
   describe('connection error', () => {
     it('throws descriptive error when daemon is not running', async () => {
-      const deadPort = await getAvailablePort(TEST_HOST);
+      const deadServer = createServer();
+      await new Promise<void>((resolve) => {
+        deadServer.listen(0, TEST_HOST, resolve);
+      });
+
+      const address = deadServer.address();
+      if (!address || typeof address === 'string') {
+        throw new Error('Failed to resolve unused daemon client test port');
+      }
+
+      const deadPort = address.port;
+      await new Promise<void>((resolve, reject) => {
+        deadServer.close((error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve();
+        });
+      });
+
       const deadClient = new DaemonClient(deadPort, TEST_HOST);
       await expect(deadClient.health()).rejects.toThrow('Cannot connect to daemon');
     });

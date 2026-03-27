@@ -1,7 +1,6 @@
 import { describe, expect, it, afterEach, beforeEach } from 'vitest';
 import { WebSocket } from 'ws';
 import { WebSocketServer } from '../../src/websocket/websocket-server.js';
-import { getAvailablePort } from '../helpers/network.js';
 import pino from 'pino';
 
 const TEST_HOST = '127.0.0.1';
@@ -27,11 +26,9 @@ function waitForMessage(ws: WebSocket): Promise<string> {
 describe('WebSocketServer - Hello Message', () => {
   let server: WebSocketServer;
   let client: WebSocket | null = null;
-  let testPort: number;
 
-  beforeEach(async () => {
-    testPort = await getAvailablePort(TEST_HOST);
-    server = new WebSocketServer(testPort, TEST_HOST, createSilentLogger(), '0.5.0');
+  beforeEach(() => {
+    server = new WebSocketServer(0, TEST_HOST, createSilentLogger(), '0.5.0');
   });
 
   afterEach(async () => {
@@ -44,7 +41,7 @@ describe('WebSocketServer - Hello Message', () => {
 
   it('stores bridge version from hello message', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
     expect(server.getBridgeVersion()).toBeNull();
@@ -57,7 +54,7 @@ describe('WebSocketServer - Hello Message', () => {
 
   it('clears bridge version on disconnect', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
     client.send(JSON.stringify({ type: 'hello', version: '0.5.0' }));
@@ -82,11 +79,9 @@ describe('WebSocketServer - Hello Message', () => {
 describe('WebSocketServer', () => {
   let server: WebSocketServer;
   let client: WebSocket | null = null;
-  let testPort: number;
 
-  beforeEach(async () => {
-    testPort = await getAvailablePort(TEST_HOST);
-    server = new WebSocketServer(testPort, TEST_HOST, createSilentLogger());
+  beforeEach(() => {
+    server = new WebSocketServer(0, TEST_HOST, createSilentLogger());
   });
 
   afterEach(async () => {
@@ -108,7 +103,7 @@ describe('WebSocketServer', () => {
       server.onClientConnect(() => resolve());
     });
 
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await connectPromise;
 
     expect(server.isConnected()).toBe(true);
@@ -125,7 +120,7 @@ describe('WebSocketServer', () => {
       server.onClientDisconnect(() => resolve());
     });
 
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     client.close();
     await disconnectPromise;
 
@@ -135,9 +130,9 @@ describe('WebSocketServer', () => {
 
   it('rejects second client connection', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
 
-    const second = await connectClient(testPort);
+    const second = await connectClient(server.getPort());
     const closePromise = new Promise<number>((resolve) => {
       second.on('close', (code) => resolve(code));
     });
@@ -148,7 +143,7 @@ describe('WebSocketServer', () => {
 
   it('sends request and receives response', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
 
     // Wait a tick for connection to register
     await new Promise((r) => setTimeout(r, 50));
@@ -177,11 +172,11 @@ describe('WebSocketServer', () => {
   it('handles request timeout', async () => {
     // Use a server with very short timeout to avoid fake timer issues
     await server.stop();
-    server = new WebSocketServer(testPort, TEST_HOST, createSilentLogger());
+    server = new WebSocketServer(0, TEST_HOST, createSilentLogger());
 
     // Temporarily patch REQUEST_TIMEOUT_MS by testing behavior directly
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
     // Send request but don't respond — will timeout after REQUEST_TIMEOUT_MS (5s)
@@ -192,7 +187,7 @@ describe('WebSocketServer', () => {
 
   it('responds to ping with pong', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
     const pongPromise = waitForMessage(client);
@@ -205,7 +200,7 @@ describe('WebSocketServer', () => {
 
   it('rejects pending requests on client disconnect', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
     // Send a request but don't respond — then disconnect
@@ -218,7 +213,7 @@ describe('WebSocketServer', () => {
 
   it('handles bridge error response', async () => {
     await server.start();
-    client = await connectClient(testPort);
+    client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
     const msgPromise = waitForMessage(client);

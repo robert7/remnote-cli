@@ -9,6 +9,18 @@ All notable changes to this project will be documented in this file.
 - Options: `--limit`, `--offset`, `--properties` (comma-separated column filter)
 - Human-readable text output with ASCII table formatting
 
+### Changed
+
+- Moved GitHub Actions CI to the shared reusable workflow in `robert7/workflows`, keeping local `main` push and pull
+  request triggers while centralizing the job definition.
+- Upgraded the lint toolchain to ESLint 9.x and `typescript-eslint` 8.x while keeping the existing `.eslintrc` flow
+  enabled for current scripts.
+- Migrated the repo to `eslint.config.mjs` flat config and aligned runtime and local tooling on Node 20.19.0 via
+  package metadata, `.nvmrc`, and `node-check.sh`.
+- Pinned the shared GitHub Actions CI workflow to `robert7/workflows/.github/workflows/node-ci.yml@v0.2.0`.
+- Fixed flaky WebSocket/daemon tests in CI by switching them to OS-assigned ephemeral ports instead of probing a free
+  port and re-binding it later.
+
 ### Fixed
 - Fixed read-table integration config loading to use only
   `~/.remnote-mcp-bridge/remnote-mcp-bridge.json`.
@@ -17,12 +29,17 @@ All notable changes to this project will be documented in this file.
 
 ### Documentation
 
+- Added a README note pointing contributors to the shared bridge pull request guide for cross-repo parity and linked PR expectations.
+- Added a pull request template that links contributors to the shared bridge PR guide.
+- Linked the CLI README to the canonical MCP server integration-testing workflow for shared live-test updates.
 - Refreshed `skills/remnote/SKILL.md` to use the current bridge connection lifecycle for troubleshooting, including
   automatic background reconnect behavior, sidebar wake-up guidance, and additional agent-useful command details such
   as `--control-port`, tag updates, journal timestamp control, and argument-shifting safeguards.
 - Updated `docs/guides/troubleshooting.md` to match the current bridge lifecycle, clarifying automatic reconnect,
   optional sidebar usage, panel status meanings, wake-up triggers, and post-upgrade daemon restart steps.
 - Documented `read-table` in the README and command/integration guides, including the strict table test config.
+- Expanded `docs/demo.md` with a Discord/OpenClaw screenshot showing a YouTube summary workflow saved into a RemNote
+  journal entry.
 
 ## [0.10.0] - 2026-03-18
 

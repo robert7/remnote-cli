@@ -144,6 +144,14 @@ export class WebSocketServer {
     return this.cliVersion;
   }
 
+  getPort(): number {
+    const address = this.wss?.address();
+    if (address && typeof address !== 'string') {
+      return address.port;
+    }
+    return this.port;
+  }
+
   onClientConnect(callback: () => void): void {
     this.connectCallbacks.push(callback);
   }

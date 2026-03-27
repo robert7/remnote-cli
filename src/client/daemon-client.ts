@@ -54,7 +54,7 @@ export class DaemonClient {
         ...options,
         headers: { 'Content-Type': 'application/json', ...options?.headers },
       });
-    } catch (error) {
+    } catch {
       throw new Error(
         `Cannot connect to daemon at ${this.baseUrl}. Is the daemon running? (remnote-cli daemon start)`
       );
