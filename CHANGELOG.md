@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- Added the `read-table` command for reading Advanced Table data via the bridge, with `--title` / `--rem-id`,
+  pagination, column filtering, and text output.
+- Added `./run-agent-integration-test.sh` for explicit agent-assisted live integration runs that wait for a connected
+  bridge before launching the suite.
+
 ### Changed
 
 - Moved GitHub Actions CI to the shared reusable workflow in `robert7/workflows`, keeping local `main` push and pull
@@ -15,7 +21,11 @@ All notable changes to this project will be documented in this file.
 - Pinned the shared GitHub Actions CI workflow to `robert7/workflows/.github/workflows/node-ci.yml@v0.2.0`.
 - Fixed flaky WebSocket/daemon tests in CI by switching them to OS-assigned ephemeral ports instead of probing a free
   port and re-binding it later.
+- Changed `read-table` to require exactly one explicit identifier flag: `--title` or `--rem-id`.
 
+### Fixed
+- Hardened `run-agent-integration-test.sh` to source `node-check.sh`, build the CLI before daemon control commands, and
+  surface daemon-log context when startup fails.
 
 ### Documentation
 
@@ -27,8 +37,18 @@ All notable changes to this project will be documented in this file.
   as `--control-port`, tag updates, journal timestamp control, and argument-shifting safeguards.
 - Updated `docs/guides/troubleshooting.md` to match the current bridge lifecycle, clarifying automatic reconnect,
   optional sidebar usage, panel status meanings, wake-up triggers, and post-upgrade daemon restart steps.
+- Documented `read-table` in the README and command/integration guides, including the strict table test config.
 - Expanded `docs/demo.md` with a Discord/OpenClaw screenshot showing a YouTube summary workflow saved into a RemNote
   journal entry.
+- Replaced the blanket agent ban in integration-test policy docs with the guarded wrapper flow for explicit human-requested live runs.
+- Clarified that agent-assisted live runs still require the human collaborator to start the bridge first and restart it
+  after bridge-code changes before reruns.
+- Clarified that switching from MCP server live integration tests to CLI live integration tests requires the MCP server
+  to be stopped first.
+
+### Attribution
+
+- Most of the cross-repo `read-table` work in this release was implemented by @timbeckss.
 
 ## [0.10.0] - 2026-03-18
 

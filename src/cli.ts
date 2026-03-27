@@ -8,6 +8,7 @@ import { registerReadCommand } from './commands/read.js';
 import { registerUpdateCommand } from './commands/update.js';
 import { registerJournalCommand } from './commands/journal.js';
 import { registerStatusCommand } from './commands/status.js';
+import { registerReadTableCommand } from './commands/table.js';
 
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json') as { version: string };
@@ -32,6 +33,7 @@ export function createProgram(version: string): Command {
   registerUpdateCommand(program);
   registerJournalCommand(program);
   registerStatusCommand(program);
+  registerReadTableCommand(program);
 
   return program;
 }

@@ -266,4 +266,82 @@ describe('command bridge action mapping', () => {
     });
     executeSpy.mockRestore();
   });
+
+  it('maps read-table command to read_table', async () => {
+    const executeSpy = await runCommand(['read-table', '--title', 'My Table']);
+    expect(executeSpy).toHaveBeenCalledWith('read_table', {
+      tableTitle: 'My Table',
+      limit: 50,
+      offset: 0,
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps read-table command with --limit option', async () => {
+    const executeSpy = await runCommand(['read-table', '--title', 'My Table', '--limit', '20']);
+    expect(executeSpy).toHaveBeenCalledWith('read_table', {
+      tableTitle: 'My Table',
+      limit: 20,
+      offset: 0,
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps read-table command with --offset option', async () => {
+    const executeSpy = await runCommand(['read-table', '--title', 'My Table', '--offset', '10']);
+    expect(executeSpy).toHaveBeenCalledWith('read_table', {
+      tableTitle: 'My Table',
+      limit: 50,
+      offset: 10,
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps read-table command with --properties filter', async () => {
+    const executeSpy = await runCommand([
+      'read-table',
+      '--title',
+      'My Table',
+      '--properties',
+      'Status,Priority',
+    ]);
+    expect(executeSpy).toHaveBeenCalledWith('read_table', {
+      tableTitle: 'My Table',
+      limit: 50,
+      offset: 0,
+      propertyFilter: ['Status', 'Priority'],
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps read-table command with Rem ID as table identifier', async () => {
+    const executeSpy = await runCommand(['read-table', '--rem-id', 'abc123-rem-id']);
+    expect(executeSpy).toHaveBeenCalledWith('read_table', {
+      tableRemId: 'abc123-rem-id',
+      limit: 50,
+      offset: 0,
+    });
+    executeSpy.mockRestore();
+  });
+
+  it('maps read-table command with all options combined', async () => {
+    const executeSpy = await runCommand([
+      'read-table',
+      '--title',
+      'Table',
+      '--limit',
+      '10',
+      '--offset',
+      '5',
+      '--properties',
+      'Name',
+    ]);
+    expect(executeSpy).toHaveBeenCalledWith('read_table', {
+      tableTitle: 'Table',
+      limit: 10,
+      offset: 5,
+      propertyFilter: ['Name'],
+    });
+    executeSpy.mockRestore();
+  });
 });

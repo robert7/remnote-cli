@@ -103,6 +103,7 @@ Pull requests that affect bridge-consumer behavior should follow the shared PR r
 | `search <query>` | Search for notes |
 | `search-tag <tag>` | Search for tagged notes with ancestor context |
 | `read <rem-id>` | Read a note by ID in markdown or structured form |
+| `read-table --title <title> \| --rem-id <id>` | Read Advanced Table rows, columns, and property metadata |
 | `update <rem-id>` | Update an existing note with append/replace content operations |
 | `journal [content]` | Append markdown content to today's journal |
 | `status` | Check bridge connection status |
