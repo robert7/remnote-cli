@@ -191,19 +191,31 @@ this sequence in order:
    - use the browser tool to ensure `https://www.remnote.com/` is open and reachable
    - re-run `remnote-cli status --text`
    - if needed, wait and retry for up to 30 seconds because the bridge may still be in burst retry or standby retry
-5. If it is still disconnected:
+5. If the browser tool is unavailable during recovery:
+   - do not stop
+   - use the OpenClaw-managed browser CLI against profile `openclaw` to try browser-side recovery:
+     - `openclaw browser --browser-profile openclaw status`
+     - if the CLI is reachable, run:
+       - `openclaw browser --browser-profile openclaw stop`
+       - `openclaw browser --browser-profile openclaw start`
+       - `openclaw browser --browser-profile openclaw open https://www.remnote.com/`
+   - after CLI-based browser recovery, re-run `remnote-cli status --text`
+   - then retry the original RemNote command if bridge connectivity is restored
+   - if the CLI reports browser disabled, bundled browser plugin missing/disabled, or another gateway-level browser
+     unavailability state, report that specific browser/runtime condition instead of describing RemNote itself as broken
+6. If it is still disconnected:
    - use the browser tool to open the right sidebar and click the `MCP` icon if present
    - opening the panel is itself a wake-up trigger and may restart faster retries
-6. Inspect the plugin panel state:
+7. Inspect the plugin panel state:
    - `Connected` means retry the CLI command
    - `Connecting` means a connection attempt is in progress; wait briefly, then re-run `remnote-cli status --text`
    - `Retrying` means the burst retry window is active; wait briefly or use `Reconnect Now`
    - `Waiting for server` means standby mode is active; use `Reconnect Now` or another wake-up trigger
-7. If the `MCP` icon is missing, report that the plugin UI is not available in RemNote.
-8. If the panel is visible but still not connected:
+8. If the `MCP` icon is missing, report that the plugin UI is not available in RemNote.
+9. If the panel is visible but still not connected:
    - capture the visible panel state, disconnect reason, and whether `Reconnect Now` helped
    - report that context to the user before stopping
-9. Only after the sequence above fails should you report the command failure as unresolved.
+10. Only after the sequence above fails should you report the command failure as unresolved.
 
 ## Operational Notes
 
