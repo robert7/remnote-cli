@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Changed
+### Added
+- Added weekly Dependabot updates for npm dependencies and GitHub Actions workflow references.
 
+### Changed
 - Extend the `remnote` skill's failure-handling sequence so a missing browser tool now triggers OpenClaw-managed
   browser CLI recovery (`status` -> `stop` -> `start` -> `open https://www.remnote.com/`) before the agent reports
   RemNote bridge work as unresolved, and require gateway/plugin-disabled browser states to be reported precisely.
