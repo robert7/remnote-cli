@@ -1,6 +1,6 @@
 # remnote-cli
 
-![Status](https://img.shields.io/badge/status-beta-yellow) ![License](https://img.shields.io/badge/license-MIT-blue)
+![License](https://img.shields.io/badge/license-MIT-blue)
 ![CI](https://github.com/robert7/remnote-cli/actions/workflows/ci.yml/badge.svg)
 [![npm version](https://img.shields.io/npm/v/remnote-cli)](https://www.npmjs.com/package/remnote-cli)
 [![codecov](https://codecov.io/gh/robert7/remnote-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/robert7/remnote-cli)

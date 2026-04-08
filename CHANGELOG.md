@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Added weekly Dependabot updates for npm dependencies and GitHub Actions workflow references.
 
 ### Changed
+- Removed the README beta status badge.
 - Removed the README's "still experimental" wording and kept the issue-reporting link.
 - Added an npm version badge to README install docs so the published package page is one click away.
 - Extend the `remnote` skill's failure-handling sequence so a missing browser tool now triggers OpenClaw-managed
