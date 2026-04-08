@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - Extend the `remnote` skill's failure-handling sequence so a missing browser tool now triggers OpenClaw-managed
   browser CLI recovery (`status` -> `stop` -> `start` -> `open https://www.remnote.com/`) before the agent reports
   RemNote bridge work as unresolved, and require gateway/plugin-disabled browser states to be reported precisely.
+- Upgraded core Node.js dependencies and test/lint toolchain packages to current major versions, and declared
+  `@eslint/js` explicitly so local linting remains reproducible under ESLint 10.
 
 ## [0.11.0] - 2026-03-27
 

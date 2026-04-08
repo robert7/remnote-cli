@@ -41,7 +41,9 @@ export async function readContentFileOrStdin(
     return buffer.toString('utf8');
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to read content file "${pathOrDash}": ${message}`);
+    throw new Error(`Failed to read content file "${pathOrDash}": ${message}`, {
+      cause: error,
+    });
   }
 }
 

@@ -58,25 +58,17 @@ describe('PID utilities', () => {
     });
 
     it('returns null-equivalent when file does not exist', async () => {
-      let info: PidInfo | null = null;
-      try {
-        const content = await readFile(testPidFile, 'utf-8');
-        info = JSON.parse(content) as PidInfo;
-      } catch {
-        info = null;
-      }
+      const info: PidInfo | null = await readFile(testPidFile, 'utf-8')
+        .then((content) => JSON.parse(content) as PidInfo)
+        .catch(() => null);
       expect(info).toBeNull();
     });
 
     it('returns null-equivalent for invalid JSON', async () => {
       await writeFile(testPidFile, 'not json', 'utf-8');
-      let info: PidInfo | null = null;
-      try {
-        const content = await readFile(testPidFile, 'utf-8');
-        info = JSON.parse(content) as PidInfo;
-      } catch {
-        info = null;
-      }
+      const info: PidInfo | null = await readFile(testPidFile, 'utf-8')
+        .then((content) => JSON.parse(content) as PidInfo)
+        .catch(() => null);
       expect(info).toBeNull();
     });
 
