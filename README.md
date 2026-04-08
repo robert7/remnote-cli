@@ -2,6 +2,7 @@
 
 ![Status](https://img.shields.io/badge/status-beta-yellow) ![License](https://img.shields.io/badge/license-MIT-blue)
 ![CI](https://github.com/robert7/remnote-cli/actions/workflows/ci.yml/badge.svg)
+[![npm version](https://img.shields.io/npm/v/remnote-cli)](https://www.npmjs.com/package/remnote-cli)
 [![codecov](https://codecov.io/gh/robert7/remnote-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/robert7/remnote-cli)
 
 CLI (command-line interface) companion for the [RemNote Automation Bridge](https://github.com/robert7/remnote-mcp-bridge) plugin.
@@ -9,7 +10,7 @@ Provides terminal access to your RemNote knowledge base through a lightweight da
 Useful e.g. for integration with OpenClaw agents, scripting and other automation, including hierarchical markdown note
 creation and RemNote-native flashcards.
 
-> This is a working solution, but still experimental. If you run into any issues, please [report them here](https://github.com/robert7/remnote-cli/issues).
+> If you run into any issues, please [report them here](https://github.com/robert7/remnote-cli/issues).
 
 ## Demo
 
