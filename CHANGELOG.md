@@ -4,18 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Added
-- Added weekly Dependabot updates for npm dependencies and GitHub Actions workflow references.
+## [0.12.0] - 2026-04-09
 
 ### Changed
-- Removed the README beta status badge.
-- Removed the README's "still experimental" wording and kept the issue-reporting link.
-- Added an npm version badge to README install docs so the published package page is one click away.
-- Extend the `remnote` skill's failure-handling sequence so a missing browser tool now triggers OpenClaw-managed
+- Extended the `remnote` skill's failure-handling sequence so a missing browser tool now triggers OpenClaw-managed
   browser CLI recovery (`status` -> `stop` -> `start` -> `open https://www.remnote.com/`) before the agent reports
-  RemNote bridge work as unresolved, and require gateway/plugin-disabled browser states to be reported precisely.
-- Upgraded core Node.js dependencies and test/lint toolchain packages to current major versions, and declared
-  `@eslint/js` explicitly so local linting remains reproducible under ESLint 10.
+  RemNote bridge work as unresolved.
+- Browser recovery failures now report gateway and plugin-disabled states more precisely, which makes RemNote bridge
+  issues easier to diagnose from automation runs.
 
 ## [0.11.0] - 2026-03-27
 
