@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- Added readable `tags` metadata to `search`, `search-tag`, and `read` JSON responses from the shared bridge
+  contract, and surfaced those tags in CLI `--text` output.
+
+### Documentation
+- Updated the command reference and README to describe readable `tags` on `search` / `read` as optional/best-effort,
+  link to the bridge limitation note, and explain why the live integration suite no longer asserts tags there.
+
 ## [0.12.0] - 2026-04-09
 
 ### Changed

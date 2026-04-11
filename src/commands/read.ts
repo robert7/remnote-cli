@@ -47,6 +47,9 @@ export function registerReadCommand(program: Command): void {
             if (r.aliases && Array.isArray(r.aliases) && r.aliases.length > 0) {
               lines.push(`Aliases: ${(r.aliases as string[]).join(', ')}`);
             }
+            if (r.tags && Array.isArray(r.tags) && r.tags.length > 0) {
+              lines.push(`Tags: ${(r.tags as string[]).join(', ')}`);
+            }
             if (r.cardDirection) lines.push(`Card: ${r.cardDirection}`);
             if (r.contentProperties) {
               const cp = r.contentProperties as Record<string, unknown>;

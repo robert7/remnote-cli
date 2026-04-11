@@ -57,6 +57,14 @@ npm run test:integration -- --yes
 
 If the status check (workflow 1) fails, workflows 2-6 are skipped.
 
+Known live limitation:
+
+- The shared live suites intentionally do **not** assert `tags` on plain `search` or `read` results right now.
+- Reason: the live RemNote SDK currently does not expose reliable reverse note -> tags lookup, even though write
+  operations and `search-tag` still work.
+- See the bridge limitation note:
+  [tag-readback-limitations.md](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/tag-readback-limitations.md)
+
 ## Cleanup
 
 After running tests, search RemNote for `[CLI-TEST]` to find and delete test artifacts.
