@@ -35,12 +35,16 @@ function formatSearchText(data: unknown): string {
       if (note.aliases && Array.isArray(note.aliases) && note.aliases.length > 0) {
         aliasesSuffix = ` (aka: ${(note.aliases as string[]).join(', ')})`;
       }
+      let tagsSuffix = '';
+      if (note.tags && Array.isArray(note.tags) && note.tags.length > 0) {
+        tagsSuffix = ` [tags: ${(note.tags as string[]).join(', ')}]`;
+      }
       let parentSuffix = '';
       if (typeof note.parentTitle === 'string' && note.parentTitle.length > 0) {
         const parentIdSuffix = typeof note.parentRemId === 'string' ? ` [${note.parentRemId}]` : '';
         parentSuffix = ` <- ${note.parentTitle}${parentIdSuffix}`;
       }
-      return `${i + 1}. ${typeTag}${headline}${aliasesSuffix}${parentSuffix} [${note.remId}]`;
+      return `${i + 1}. ${typeTag}${headline}${aliasesSuffix}${tagsSuffix}${parentSuffix} [${note.remId}]`;
     })
     .join('\n');
 }

@@ -24,6 +24,21 @@ function summarizeReadResult(result: Record<string, unknown>): Record<string, un
   };
 }
 
+function assertTagNamesInclude(
+  note: Record<string, unknown>,
+  expectedTagNames: string[],
+  label: string
+): void {
+  assertTruthy(Array.isArray(note.tags), `${label}: tags should be an array`);
+  const tags = note.tags as string[];
+  for (const expectedTagName of expectedTagNames) {
+    assertTruthy(
+      tags.includes(expectedTagName),
+      `${label}: tags should include ${expectedTagName}`
+    );
+  }
+}
+
 async function resolveExpectedSearchByTagTarget(
   ctx: WorkflowContext,
   taggedRemId: string
@@ -174,6 +189,7 @@ export async function readUpdateWorkflow(
         state.integrationParentTitle as string,
         'read note B parentTitle should match integration parent'
       );
+      assertTagNamesInclude(result, [state.searchByTagTag as string], `read note B mode=${mode}`);
       if (mode === 'markdown') {
         assertHasField(result, 'content', 'read note B markdown');
         assertTruthy(typeof result.content === 'string', 'content should be string');

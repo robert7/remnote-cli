@@ -101,9 +101,9 @@ Pull requests that affect bridge-consumer behavior should follow the shared PR r
 | `daemon stop` | Stop the daemon |
 | `daemon status` | Show daemon process status |
 | `create [title] [options]` | Create notes or flashcards from inline or file-based markdown content |
-| `search <query>` | Search for notes |
+| `search <query>` | Search for notes with metadata such as tags |
 | `search-tag <tag>` | Search for tagged notes with ancestor context |
-| `read <rem-id>` | Read a note by ID in markdown or structured form |
+| `read <rem-id>` | Read a note by ID with tags and markdown or structured content |
 | `read-table --title <title> \| --rem-id <id>` | Read Advanced Table rows, columns, and property metadata |
 | `update <rem-id>` | Update an existing note with append/replace content operations |
 | `journal [content]` | Append markdown content to today's journal |

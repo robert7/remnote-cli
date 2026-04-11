@@ -42,6 +42,22 @@ describe('parent context text output', () => {
     executeSpy.mockRestore();
   });
 
+  it('shows tags in search --text output when available', async () => {
+    const { output, executeSpy } = await runTextCommand(['search', 'child'], {
+      results: [
+        {
+          remId: 'child-1',
+          headline: 'Child Note',
+          tags: ['work', 'urgent'],
+          remType: 'text',
+        },
+      ],
+    });
+
+    expect(output).toContain('Child Note [tags: work, urgent] [child-1]');
+    executeSpy.mockRestore();
+  });
+
   it('shows parent line in read --text output when available', async () => {
     const { output, executeSpy } = await runTextCommand(['read', 'child-1'], {
       remId: 'child-1',
@@ -56,6 +72,20 @@ describe('parent context text output', () => {
     expect(executeSpy).toHaveBeenCalledWith('read_note', { remId: 'child-1', depth: 5 });
     expect(output).toContain('Title: Child Note');
     expect(output).toContain('Parent: Parent Folder [parent-1]');
+    executeSpy.mockRestore();
+  });
+
+  it('shows tags line in read --text output when available', async () => {
+    const { output, executeSpy } = await runTextCommand(['read', 'child-1'], {
+      remId: 'child-1',
+      headline: 'Child Note',
+      remType: 'text',
+      tags: ['reference', 'next-action'],
+      content: '',
+      contentProperties: { childrenRendered: 0, childrenTotal: 0, contentTruncated: false },
+    });
+
+    expect(output).toContain('Tags: reference, next-action');
     executeSpy.mockRestore();
   });
 });

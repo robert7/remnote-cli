@@ -203,6 +203,7 @@ Shared options for `search` and `search-tag`:
 Behavior rules:
 
 - In `--text` mode, each line includes headline/title and Rem ID.
+- Tags are shown in `--text` mode when the bridge returns them as `[tags: tag1, tag2]`.
 - Parent context is appended in text output when available as `<- Parent Title [parentRemId]`.
 - `--depth`, `--child-limit`, and `--max-content-length` are most relevant when content rendering is enabled.
 
@@ -248,7 +249,7 @@ remnote-cli read <rem-id> [options]
 
 Behavior rules:
 
-- `--text` mode prints metadata when present: title/headline, ID, type, parent, aliases, card direction, and content
+- `--text` mode prints metadata when present: title/headline, ID, type, parent, aliases, tags, card direction, and content
   stats.
 - If `content` exists, it is printed after a blank line.
 - In structured mode, use JSON output (default) to preserve `contentStructured` rem IDs and child hierarchy.
