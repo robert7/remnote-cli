@@ -206,6 +206,10 @@ Behavior rules:
 - Tags are shown in `--text` mode when the bridge returns them as `[tags: tag1, tag2]`.
 - Parent context is appended in text output when available as `<- Parent Title [parentRemId]`.
 - `--depth`, `--child-limit`, and `--max-content-length` are most relevant when content rendering is enabled.
+- Live RemNote currently does not expose reliable reverse note -> tags lookup for plain `search` / `read`, so tags
+  in `search` output remain best-effort.
+- See the bridge limitation note:
+  [tag-readback-limitations.md](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/tag-readback-limitations.md)
 
 Examples:
 
@@ -254,6 +258,10 @@ Behavior rules:
 - If `content` exists, it is printed after a blank line.
 - In structured mode, use JSON output (default) to preserve `contentStructured` rem IDs and child hierarchy.
 - `--include-content none` suppresses rendered content.
+- Live RemNote currently does not expose reliable reverse note -> tags lookup for plain `read`, so tags in read output
+  remain best-effort.
+- See the bridge limitation note:
+  [tag-readback-limitations.md](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/tag-readback-limitations.md)
 
 Examples:
 

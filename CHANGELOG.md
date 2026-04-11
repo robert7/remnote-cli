@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
   contract, and surfaced those tags in CLI `--text` output.
 
 ### Documentation
-- Updated the command reference and README to document tag-aware read/search output.
+- Updated the command reference and README to describe readable `tags` on `search` / `read` as optional/best-effort,
+  link to the bridge limitation note, and explain why the live integration suite no longer asserts tags there.
 
 ## [0.12.0] - 2026-04-09
 
