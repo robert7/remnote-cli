@@ -7,7 +7,16 @@ Demonstration of `remnote-cli` against a live RemNote + RemNote Automation Bridg
 No MCP server config needed. In any coding harness — Claude Code, GitHub Copilot CLI, Codex CLI, or similar — you
 can interact with RemNote by pasting a single prompt that loads the skill and drives the CLI.
 
-**Prerequisites:** `remnote-cli` installed globally, RemNote Automation Bridge plugin running in RemNote.
+### Before you start
+
+> **Same machine required.** The coding harness must run on the same machine as `remnote-cli` and the CLI daemon.
+> Cloud-based harnesses (Claude Cowork, ChatGPT) cannot reach a local daemon — this approach is for locally running
+> tools only.
+
+1. **Install `remnote-cli` globally** on the same machine as the coding harness — see
+   [Quick Start](https://github.com/robert7/remnote-cli#quick-start) in the README.
+2. **Start the daemon:** `remnote-cli daemon start`
+3. **Verify the bridge is connected:** `remnote-cli status --text`
 
 ### How it works
 
