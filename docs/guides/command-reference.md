@@ -19,14 +19,14 @@ the RemNote Automation Bridge plugin connected to the daemon.
 
 ## Global Options
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--json` | enabled | JSON output mode |
-| `--text` | off | Human-readable output mode |
-| `--control-port <port>` | `3100` | Control API port used by non-daemon commands |
-| `--verbose` | off | Reserved for verbose stderr logging |
-| `--version` | n/a | Show CLI version |
-| `--help` | n/a | Show help |
+| Flag                    | Default | Description                                  |
+| ----------------------- | ------- | -------------------------------------------- |
+| `--json`                | enabled | JSON output mode                             |
+| `--text`                | off     | Human-readable output mode                   |
+| `--control-port <port>` | `3100`  | Control API port used by non-daemon commands |
+| `--verbose`             | off     | Reserved for verbose stderr logging          |
+| `--version`             | n/a     | Show CLI version                             |
+| `--help`                | n/a     | Show help                                    |
 
 ### Output mode rules
 
@@ -35,7 +35,7 @@ the RemNote Automation Bridge plugin connected to the daemon.
 
 ### Argument Quoting and Shifting
 
-CLI environments (especially Windows shells) can sometimes "swallow" empty strings or misinterpret arguments if quoting is missing. This can lead to **argument shifting**, where a flag (like `--content`) is incorrectly interpreted as the *value* for a preceding option (like `--title`).
+CLI environments (especially Windows shells) can sometimes "swallow" empty strings or misinterpret arguments if quoting is missing. This can lead to **argument shifting**, where a flag (like `--content`) is incorrectly interpreted as the _value_ for a preceding option (like `--title`).
 
 To prevent this:
 
@@ -45,12 +45,12 @@ To prevent this:
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | Generic command/action error |
-| `2` | Daemon not running / unreachable |
-| `3` | Reserved for bridge-not-connected flows |
+| Code | Meaning                                 |
+| ---- | --------------------------------------- |
+| `0`  | Success                                 |
+| `1`  | Generic command/action error            |
+| `2`  | Daemon not running / unreachable        |
+| `3`  | Reserved for bridge-not-connected flows |
 
 ## daemon
 
@@ -68,13 +68,13 @@ Start the daemon in background mode (default) or foreground mode.
 remnote-cli daemon start [options]
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--ws-port <port>` | `3002` | WebSocket server port for bridge plugin connection |
-| `--control-port <port>` | `3100` | HTTP control API port for CLI commands |
-| `-f, --foreground` | `false` | Run in current process (no detach) |
-| `--log-level <level>` | `silent` | One of `silent`, `debug`, `info`, `warn`, `error` |
-| `--log-file <path>` | auto | Log destination file |
+| Option                  | Default  | Description                                        |
+| ----------------------- | -------- | -------------------------------------------------- |
+| `--ws-port <port>`      | `3002`   | WebSocket server port for bridge plugin connection |
+| `--control-port <port>` | `3100`   | HTTP control API port for CLI commands             |
+| `-f, --foreground`      | `false`  | Run in current process (no detach)                 |
+| `--log-level <level>`   | `silent` | One of `silent`, `debug`, `info`, `warn`, `error`  |
+| `--log-file <path>`     | auto     | Log destination file                               |
 
 Behavior rules:
 
@@ -138,13 +138,13 @@ Create a new RemNote note or a hierarchical tree.
 remnote-cli create [title] [options]
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--title <text>` | none | Note title |
-| `-c, --content <text>` | none | Initial content (markdown supported) |
-| `--content-file <path>` | none | Read initial content from UTF-8 file (`-` for stdin) |
-| `--parent-id <id>` | none | Parent Rem ID |
-| `-t, --tags <tag...>` | none | One or more tags |
+| Option                  | Default | Description                                          |
+| ----------------------- | ------- | ---------------------------------------------------- |
+| `--title <text>`        | none    | Note title                                           |
+| `-c, --content <text>`  | none    | Initial content (markdown supported)                 |
+| `--content-file <path>` | none    | Read initial content from UTF-8 file (`-` for stdin) |
+| `--parent-id <id>`      | none    | Parent Rem ID                                        |
+| `-t, --tags <tag...>`   | none    | One or more tags                                     |
 
 Behavior rules:
 
@@ -192,13 +192,13 @@ remnote-cli search <query> [options]
 
 Shared options for `search` and `search-tag`:
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `-l, --limit <n>` | `50` | Maximum number of results |
-| `--include-content <mode>` | `none` | `none`, `markdown`, or `structured` |
-| `--depth <n>` | `1` | Child depth for rendered content |
-| `--child-limit <n>` | `20` | Max children per hierarchy level |
-| `--max-content-length <n>` | `3000` | Max rendered content character count |
+| Option                     | Default | Description                          |
+| -------------------------- | ------- | ------------------------------------ |
+| `-l, --limit <n>`          | `50`    | Maximum number of results            |
+| `--include-content <mode>` | `none`  | `none`, `markdown`, or `structured`  |
+| `--depth <n>`              | `1`     | Child depth for rendered content     |
+| `--child-limit <n>`        | `20`    | Max children per hierarchy level     |
+| `--max-content-length <n>` | `3000`  | Max rendered content character count |
 
 Behavior rules:
 
@@ -206,10 +206,7 @@ Behavior rules:
 - Tags are shown in `--text` mode when the bridge returns them as `[tags: tag1, tag2]`.
 - Parent context is appended in text output when available as `<- Parent Title [parentRemId]`.
 - `--depth`, `--child-limit`, and `--max-content-length` are most relevant when content rendering is enabled.
-- Live RemNote currently does not expose reliable reverse note -> tags lookup for plain `search` / `read`, so tags
-  in `search` output remain best-effort.
-- See the bridge limitation note:
-  [tag-readback-limitations.md](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/tag-readback-limitations.md)
+- `tags` is optional and present when the matched Rem has readable tag metadata.
 
 Examples:
 
@@ -244,12 +241,12 @@ Read one note by Rem ID.
 remnote-cli read <rem-id> [options]
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `-d, --depth <n>` | `5` | Child depth to render |
-| `--include-content <mode>` | `markdown` | `markdown`, `structured`, or `none` |
-| `--child-limit <n>` | `100` | Max children per hierarchy level |
-| `--max-content-length <n>` | `100000` | Max rendered content character count |
+| Option                     | Default    | Description                          |
+| -------------------------- | ---------- | ------------------------------------ |
+| `-d, --depth <n>`          | `5`        | Child depth to render                |
+| `--include-content <mode>` | `markdown` | `markdown`, `structured`, or `none`  |
+| `--child-limit <n>`        | `100`      | Max children per hierarchy level     |
+| `--max-content-length <n>` | `100000`   | Max rendered content character count |
 
 Behavior rules:
 
@@ -258,10 +255,7 @@ Behavior rules:
 - If `content` exists, it is printed after a blank line.
 - In structured mode, use JSON output (default) to preserve `contentStructured` rem IDs and child hierarchy.
 - `--include-content none` suppresses rendered content.
-- Live RemNote currently does not expose reliable reverse note -> tags lookup for plain `read`, so tags in read output
-  remain best-effort.
-- See the bridge limitation note:
-  [tag-readback-limitations.md](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/tag-readback-limitations.md)
+- `tags` is optional and present when the returned Rem has readable tag metadata.
 
 Examples:
 
@@ -279,13 +273,13 @@ Read one Advanced Table by exact title or Rem ID.
 remnote-cli read-table (--title <title> | --rem-id <id>) [options]
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--title <title>` | none | Exact Advanced Table title |
-| `--rem-id <id>` | none | Table Rem ID |
-| `-l, --limit <n>` | `50` | Maximum rows to return |
-| `--offset <n>` | `0` | Zero-based row offset |
-| `-p, --properties <names>` | none | Comma-separated property names to include |
+| Option                     | Default | Description                               |
+| -------------------------- | ------- | ----------------------------------------- |
+| `--title <title>`          | none    | Exact Advanced Table title                |
+| `--rem-id <id>`            | none    | Table Rem ID                              |
+| `-l, --limit <n>`          | `50`    | Maximum rows to return                    |
+| `--offset <n>`             | `0`     | Zero-based row offset                     |
+| `-p, --properties <names>` | none    | Comma-separated property names to include |
 
 Behavior rules:
 
@@ -311,15 +305,15 @@ Update an existing note.
 remnote-cli update <rem-id> [options]
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--title <text>` | none | Replace title/headline |
-| `--append <text>` | none | Append content |
-| `--append-file <path>` | none | Read appended content from UTF-8 file (`-` for stdin) |
-| `--replace <text>` | none | Replace direct child content (empty string clears all direct children) |
-| `--replace-file <path>` | none | Read replacement content from UTF-8 file (`-` for stdin; empty file clears all direct children) |
-| `--add-tags <tag...>` | none | Add one or more tags |
-| `--remove-tags <tag...>` | none | Remove one or more tags |
+| Option                   | Default | Description                                                                                     |
+| ------------------------ | ------- | ----------------------------------------------------------------------------------------------- |
+| `--title <text>`         | none    | Replace title/headline                                                                          |
+| `--append <text>`        | none    | Append content                                                                                  |
+| `--append-file <path>`   | none    | Read appended content from UTF-8 file (`-` for stdin)                                           |
+| `--replace <text>`       | none    | Replace direct child content (empty string clears all direct children)                          |
+| `--replace-file <path>`  | none    | Read replacement content from UTF-8 file (`-` for stdin; empty file clears all direct children) |
+| `--add-tags <tag...>`    | none    | Add one or more tags                                                                            |
+| `--remove-tags <tag...>` | none    | Remove one or more tags                                                                         |
 
 Behavior rules:
 
@@ -356,11 +350,11 @@ Append to today's daily document.
 remnote-cli journal [content] [options]
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--content <text>` | none | Journal entry content |
-| `--content-file <path>` | none | Read journal entry from UTF-8 file (`-` for stdin) |
-| `--no-timestamp` | timestamp enabled | Disable `[HH:MM:SS]` prefix |
+| Option                  | Default           | Description                                        |
+| ----------------------- | ----------------- | -------------------------------------------------- |
+| `--content <text>`      | none              | Journal entry content                              |
+| `--content-file <path>` | none              | Read journal entry from UTF-8 file (`-` for stdin) |
+| `--no-timestamp`        | timestamp enabled | Disable `[HH:MM:SS]` prefix                        |
 
 Behavior rules:
 

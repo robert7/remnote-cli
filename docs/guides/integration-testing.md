@@ -40,10 +40,10 @@ npm run test:integration -- --yes
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CLI_CONTROL_PORT` | `3100` | Daemon control port |
-| `CLI_TEST_DELAY` | `2000` | Delay (ms) after create before search |
+| Variable           | Default | Description                           |
+| ------------------ | ------- | ------------------------------------- |
+| `CLI_CONTROL_PORT` | `3100`  | Daemon control port                   |
+| `CLI_TEST_DELAY`   | `2000`  | Delay (ms) after create before search |
 
 ## Test Workflows
 
@@ -57,13 +57,10 @@ npm run test:integration -- --yes
 
 If the status check (workflow 1) fails, workflows 2-6 are skipped.
 
-Known live limitation:
+Tag coverage:
 
-- The shared live suites intentionally do **not** assert `tags` on plain `search` or `read` results right now.
-- Reason: the live RemNote SDK currently does not expose reliable reverse note -> tags lookup, even though write
-  operations and `search-tag` still work.
-- See the bridge limitation note:
-  [tag-readback-limitations.md](https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/tag-readback-limitations.md)
+- The shared live suites assert `tags` on plain `search` and `read` for notes created with tags.
+- They also verify tag add/remove flows through both `search-tag` and direct `read` readback.
 
 ## Cleanup
 
@@ -73,6 +70,7 @@ Integration-created notes are grouped under the shared root-level anchor note
 `RemNote Automation Bridge [temporary integration test data]`.
 
 Anchor resolution is deterministic:
+
 1. multi-query `search` lookup + exact title match (trim/whitespace normalized),
 2. fallback `search-tag` lookup using the dedicated anchor tag `remnote-integration-root-anchor`,
 3. create anchor note only if both lookups fail.

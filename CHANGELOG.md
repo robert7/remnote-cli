@@ -5,16 +5,24 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+
 - Added readable `tags` metadata to `search`, `search-tag`, and `read` JSON responses from the shared bridge
   contract, and surfaced those tags in CLI `--text` output.
 
+### Fixed
+
+- Restored live integration assertions for `tags` on plain `search` and `read`, and extended tag-update coverage to
+  verify direct `read` output after add/remove operations.
+
 ### Documentation
-- Updated the command reference and README to describe readable `tags` on `search` / `read` as optional/best-effort,
-  link to the bridge limitation note, and explain why the live integration suite no longer asserts tags there.
+
+- Updated command and integration-testing docs to remove the deleted bridge limitation note and describe the current
+  working tag-readback behavior.
 
 ## [0.12.0] - 2026-04-09
 
 ### Changed
+
 - Extended the `remnote` skill's failure-handling sequence so a missing browser tool now triggers OpenClaw-managed
   browser CLI recovery (`status` -> `stop` -> `start` -> `open https://www.remnote.com/`) before the agent reports
   RemNote bridge work as unresolved.
@@ -24,15 +32,18 @@ All notable changes to this project will be documented in this file.
 ## [0.11.0] - 2026-03-27
 
 ### Added
+
 - Added the `read-table` command for reading Advanced Table data via the bridge, with `--title` / `--rem-id`,
   pagination, column filtering, and text output.
 - Added a `companion_info` WebSocket handshake so the bridge sidebar can identify a connected CLI instance and show
   its version.
 
 ### Changed
+
 - Changed `read-table` to require exactly one explicit identifier flag: `--title` or `--rem-id`.
 
 ### Fixed
+
 - Hardened `run-agent-integration-test.sh` to source `node-check.sh`, build the CLI before daemon control commands,
   surface daemon-log context when startup fails, and stop the CLI daemon it started after runs.
 
@@ -46,11 +57,13 @@ All notable changes to this project will be documented in this file.
 ## [0.9.0] - 2026-03-17
 
 ### Added
+
 - Added support for hierarchical markdown trees in `create` (`--content`, `--content-file`), `update` (`--append`, `--replace`) and `journal` (`--content`).
   - Flashcards can be created using RemNote markdown syntax (e.g., `::`, `;;`, `>>`) within the `content`.
   - Shell-safe signature in: `create [title] [options]`. Content must be provided via `--content` / `-c` or `--content-file`.
 
 ### Changed
+
 - Updated mutating bridge actions (`create_note`, `update_note`, `append_journal`) and CLI commands to return plural `remIds` and `titles` arrays for consistent multi-Rem support.
 - Updated `remnote_create_note` input schema:
   - Made `title` optional
