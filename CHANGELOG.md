@@ -4,20 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-04-24
+
 ### Added
 
 - Added readable `tags` metadata to `search`, `search-tag`, and `read` JSON responses from the shared bridge
   contract, and surfaced those tags in CLI `--text` output.
-
-### Fixed
-
-- Restored live integration assertions for `tags` on plain `search` and `read`, and extended tag-update coverage to
-  verify direct `read` output after add/remove operations.
-
-### Documentation
-
-- Updated command and integration-testing docs to remove the deleted bridge limitation note and describe the current
-  working tag-readback behavior.
 
 ## [0.12.0] - 2026-04-09
 
