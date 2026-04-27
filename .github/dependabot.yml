@@ -3,9 +3,8 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
-      time: "06:00"
+      interval: cron
+      cronjob: "0 6 15 * *"
       timezone: Europe/Bratislava
     open-pull-requests-limit: 10
     labels:
@@ -23,9 +22,8 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
-      time: "06:15"
+      interval: cron
+      cronjob: "15 6 15 * *"
       timezone: Europe/Bratislava
     open-pull-requests-limit: 5
     labels:

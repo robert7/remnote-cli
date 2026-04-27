@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Reduced Dependabot version-update checks to monthly runs on the 15th.
+
 ## [0.13.0] - 2026-04-24
 
 ### Added
