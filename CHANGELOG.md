@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Marked this repository as legacy. The maintained `remnote-cli` executable now lives in the
+  `remnote-mcp-server` package.
+- Preserved `docs/demo.md` as a forwarding page because it is externally linked.
+
+### Removed
+
+- Removed the old standalone CLI source, tests, scripts, package metadata, skills, and stale documentation from this
+  repository. Use `remnote-mcp-server` for all maintained CLI development.
+
+## [0.14.0] - 2026-05-06
+
+### Changed
+
 - Changed `remnote-cli` to connect directly to `remnote-mcp-server` over MCP Streamable HTTP.
 - Replaced `--control-port` with `--mcp-url` and `REMNOTE_MCP_URL`.
 - Updated integration wrappers to reuse or start `remnote-mcp-server` instead of managing a CLI daemon.
