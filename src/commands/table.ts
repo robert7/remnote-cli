@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { DaemonClient } from '../client/daemon-client.js';
+import { createCommandClient } from '../client/command-client.js';
 import { formatResult, formatError, type OutputFormat } from '../output/formatter.js';
 import { EXIT } from '../config.js';
 
@@ -15,7 +15,7 @@ export function registerReadTableCommand(program: Command): void {
     .action(async (opts) => {
       const globalOpts = program.opts();
       const format: OutputFormat = globalOpts.text ? 'text' : 'json';
-      const client = new DaemonClient(parseInt(globalOpts.controlPort, 10));
+      const client = createCommandClient(program);
 
       try {
         const payload: Record<string, unknown> = {
@@ -78,6 +78,8 @@ export function registerReadTableCommand(program: Command): void {
         const message = error instanceof Error ? error.message : String(error);
         console.error(formatError(message, format));
         process.exit(EXIT.ERROR);
+      } finally {
+        await client.close();
       }
     });
 }

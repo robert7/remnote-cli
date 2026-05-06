@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { DaemonClient } from '../client/daemon-client.js';
+import { createCommandClient } from '../client/command-client.js';
 import { formatResult, formatError, type OutputFormat } from '../output/formatter.js';
 import { EXIT } from '../config.js';
 
@@ -10,7 +10,7 @@ export function registerStatusCommand(program: Command): void {
     .action(async () => {
       const globalOpts = program.opts();
       const format: OutputFormat = globalOpts.text ? 'text' : 'json';
-      const client = new DaemonClient(parseInt(globalOpts.controlPort, 10));
+      const client = createCommandClient(program);
 
       try {
         const result = await client.execute('get_status', {});
@@ -28,12 +28,14 @@ export function registerStatusCommand(program: Command): void {
         );
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        if (message.includes('Cannot connect to daemon')) {
+        if (message.includes('Cannot connect to MCP server')) {
           console.error(formatError(message, format));
-          process.exit(EXIT.DAEMON_NOT_RUNNING);
+          process.exit(EXIT.MCP_SERVER_NOT_RUNNING);
         }
         console.error(formatError(message, format));
         process.exit(EXIT.ERROR);
+      } finally {
+        await client.close();
       }
     });
 }

@@ -6,7 +6,9 @@
  */
 export function checkVersionCompatibility(
   localVersion: string,
-  bridgeVersion: string
+  bridgeVersion: string,
+  localLabel = 'CLI',
+  bridgeLabel = 'bridge'
 ): string | null {
   const local = parseVersion(localVersion);
   const bridge = parseVersion(bridgeVersion);
@@ -16,7 +18,7 @@ export function checkVersionCompatibility(
   }
 
   if (local.major !== bridge.major || local.minor !== bridge.minor) {
-    return `Version mismatch: CLI v${localVersion} ↔ bridge v${bridgeVersion}. Minor version must match during 0.x development. See compatibility guide.`;
+    return `Version mismatch: ${localLabel} v${localVersion} ↔ ${bridgeLabel} v${bridgeVersion}. Minor version must match during 0.x development. See compatibility guide.`;
   }
 
   return null;

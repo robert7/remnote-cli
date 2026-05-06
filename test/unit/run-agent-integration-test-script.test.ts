@@ -7,11 +7,14 @@ import { spawnSync } from 'node:child_process';
 function setupCliWrapperSandbox(runExitCode: number) {
   const tempRoot = mkdtempSync(join(tmpdir(), 'remnote-cli-agent-wrapper-'));
   const binDir = join(tempRoot, 'bin');
+  const serverRepo = resolve(tempRoot, '..', 'remnote-mcp-server');
   mkdirSync(binDir, { recursive: true });
+  mkdirSync(serverRepo, { recursive: true });
 
   const scriptPath = join(tempRoot, 'run-agent-integration-test.sh');
   const integrationScriptPath = join(tempRoot, 'run-integration-test.sh');
   const nodeCheckPath = join(tempRoot, 'node-check.sh');
+  const serverNodeCheckPath = join(serverRepo, 'node-check.sh');
   const commandLogPath = join(tempRoot, 'commands.log');
   const statusCountPath = join(tempRoot, 'status-count');
 
@@ -20,6 +23,8 @@ function setupCliWrapperSandbox(runExitCode: number) {
 
   writeFileSync(nodeCheckPath, '#!/usr/bin/env bash\nreturn 0\n');
   chmodSync(nodeCheckPath, 0o755);
+  writeFileSync(serverNodeCheckPath, '#!/usr/bin/env bash\nreturn 0\n');
+  chmodSync(serverNodeCheckPath, 0o755);
 
   writeFileSync(
     integrationScriptPath,
@@ -39,13 +44,10 @@ cmd="$*"
 if [[ "$cmd" == "run build" ]]; then
   exit 0
 fi
-if [[ "$cmd" == "run start -- daemon start --log-level warn --log-file "* ]]; then
+if [[ "$cmd" == "run start -- --log-level warn --log-file "* ]]; then
   exit 0
 fi
-if [[ "$cmd" == "run start -- --text daemon stop" ]]; then
-  exit 0
-fi
-if [[ "$cmd" == "run start -- --text daemon status" ]]; then
+if [[ "$cmd" == "run start -- --text status" ]]; then
   count=0
   if [[ -f "${statusCountPath}" ]]; then
     count="$(cat "${statusCountPath}")"
@@ -53,10 +55,10 @@ if [[ "$cmd" == "run start -- --text daemon status" ]]; then
   count=$((count + 1))
   echo "$count" > "${statusCountPath}"
   if (( count == 1 )); then
-    echo "Daemon is not running"
+    echo "Cannot connect to MCP server"
     exit 2
   fi
-  printf 'Status: running\\nPID: 123\\nUptime: 1s\\nWebSocket port: 3002\\nControl port: 3100\\nBridge connected: true\\n'
+  printf 'Bridge: Connected (plugin v0.14.0)\\nCLI: v0.14.0\\n'
   exit 0
 fi
 echo "unexpected npm invocation: $cmd" >&2
@@ -77,7 +79,7 @@ exit 1
 }
 
 describe('run-agent-integration-test.sh', () => {
-  it('stops the daemon it started after a successful integration run', () => {
+  it('starts the MCP server when needed before a successful integration run', () => {
     const sandbox = setupCliWrapperSandbox(0);
 
     const result = spawnSync('bash', [sandbox.scriptPath, '--yes'], {
@@ -89,12 +91,12 @@ describe('run-agent-integration-test.sh', () => {
     const commandLog = readFileSync(sandbox.commandLogPath, 'utf-8');
 
     expect(result.status).toBe(0);
-    expect(commandLog).toContain('run start -- daemon start --log-level warn --log-file');
+    expect(commandLog).toContain('run start -- --log-level warn --log-file');
     expect(commandLog).toContain('integration:--yes');
-    expect(commandLog).toContain('run start -- --text daemon stop');
+    expect(commandLog).not.toContain('daemon');
   });
 
-  it('stops the daemon it started after a failed integration run', () => {
+  it('preserves failed integration exit code without daemon commands', () => {
     const sandbox = setupCliWrapperSandbox(7);
 
     const result = spawnSync('bash', [sandbox.scriptPath], {
@@ -107,6 +109,6 @@ describe('run-agent-integration-test.sh', () => {
 
     expect(result.status).toBe(7);
     expect(commandLog).toContain('integration:');
-    expect(commandLog).toContain('run start -- --text daemon stop');
+    expect(commandLog).not.toContain('daemon');
   });
 });

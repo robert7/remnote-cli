@@ -1,7 +1,6 @@
 import { Command } from 'commander';
 import { createRequire } from 'node:module';
-import { DEFAULT_CONTROL_PORT } from './config.js';
-import { registerDaemonCommand } from './commands/daemon.js';
+import { DEFAULT_MCP_URL } from './config.js';
 import { registerCreateCommand } from './commands/create.js';
 import { registerSearchByTagCommand, registerSearchCommand } from './commands/search.js';
 import { registerReadCommand } from './commands/read.js';
@@ -18,14 +17,17 @@ export function createProgram(version: string): Command {
 
   program
     .name('remnote-cli')
-    .description('CLI companion for RemNote Bridge via WebSocket')
+    .description('CLI client for RemNote MCP Server')
     .version(version)
     .option('--json', 'JSON output (default)')
     .option('--text', 'Human-readable output')
-    .option('--control-port <port>', 'Override daemon control port', String(DEFAULT_CONTROL_PORT))
+    .option(
+      '--mcp-url <url>',
+      'RemNote MCP server URL',
+      process.env.REMNOTE_MCP_URL || DEFAULT_MCP_URL
+    )
     .option('--verbose', 'Enable verbose stderr logging');
 
-  registerDaemonCommand(program);
   registerCreateCommand(program);
   registerSearchCommand(program);
   registerSearchByTagCommand(program);

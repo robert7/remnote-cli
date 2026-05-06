@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { DaemonClient } from '../../src/client/daemon-client.js';
+import { McpServerClient } from '../../src/client/mcp-server-client.js';
 import { createProgram } from '../../src/cli.js';
 
 const tempDirs: string[] = [];
@@ -16,7 +16,7 @@ async function createTempContentFile(content: string): Promise<string> {
 }
 
 async function runCommand(args: string[]): Promise<MockInstance> {
-  const executeSpy = vi.spyOn(DaemonClient.prototype, 'execute').mockResolvedValue({ ok: true });
+  const executeSpy = vi.spyOn(McpServerClient.prototype, 'execute').mockResolvedValue({ ok: true });
   const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   const program = createProgram('0.1.0-test');
 

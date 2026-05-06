@@ -1,12 +1,12 @@
 import { describe, expect, it, vi, type MockInstance } from 'vitest';
-import { DaemonClient } from '../../src/client/daemon-client.js';
+import { McpServerClient } from '../../src/client/mcp-server-client.js';
 import { createProgram } from '../../src/cli.js';
 
 async function runTextCommand(
   args: string[],
   result: unknown
 ): Promise<{ output: string; executeSpy: MockInstance }> {
-  const executeSpy = vi.spyOn(DaemonClient.prototype, 'execute').mockResolvedValue(result);
+  const executeSpy = vi.spyOn(McpServerClient.prototype, 'execute').mockResolvedValue(result);
   const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   const program = createProgram('0.1.0-test');

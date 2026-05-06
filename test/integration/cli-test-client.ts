@@ -18,17 +18,17 @@ export interface CliResult {
  * All commands use --json by default for machine-parseable output.
  */
 export class CliTestClient {
-  private controlPort: number;
+  private mcpUrl: string;
 
-  constructor(controlPort: number) {
-    this.controlPort = controlPort;
+  constructor(mcpUrl: string) {
+    this.mcpUrl = mcpUrl;
   }
 
   /**
    * Run a CLI command and return the result.
    */
   async run(args: string[], timeoutMs = 10000): Promise<CliResult> {
-    const fullArgs = [cliBin, '--json', '--control-port', String(this.controlPort), ...args];
+    const fullArgs = [cliBin, '--json', '--mcp-url', this.mcpUrl, ...args];
 
     return new Promise((resolve, reject) => {
       const proc = spawn(process.execPath, fullArgs, {

@@ -4,7 +4,7 @@
  * Verifies the CLI can communicate with RemNote via the bridge.
  * If this fails, remaining workflows are skipped.
  *
- * Prerequisites: Daemon must be running AND RemNote bridge must be connected.
+ * Prerequisites: MCP server must be running AND RemNote bridge must be connected.
  */
 
 import { assertHasField, assertTruthy } from '../assertions.js';

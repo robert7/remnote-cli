@@ -8,14 +8,14 @@ describe('createProgram', () => {
 
     expect(program).toBeInstanceOf(Command);
     expect(program.name()).toBe('remnote-cli');
-    expect(program.description()).toContain('CLI companion');
+    expect(program.description()).toContain('CLI client');
   });
 
   it('registers all expected subcommands', () => {
     const program = createProgram('0.1.0');
     const commandNames = program.commands.map((c) => c.name());
 
-    expect(commandNames).toContain('daemon');
+    expect(commandNames).not.toContain('daemon');
     expect(commandNames).toContain('create');
     expect(commandNames).toContain('search');
     expect(commandNames).toContain('search-tag');
@@ -31,18 +31,14 @@ describe('createProgram', () => {
 
     expect(optionNames).toContain('--json');
     expect(optionNames).toContain('--text');
-    expect(optionNames).toContain('--control-port');
+    expect(optionNames).toContain('--mcp-url');
+    expect(optionNames).not.toContain('--control-port');
     expect(optionNames).toContain('--verbose');
   });
 
-  it('daemon command has start, stop, status subcommands', () => {
+  it('does not register daemon lifecycle commands', () => {
     const program = createProgram('0.1.0');
     const daemonCmd = program.commands.find((c) => c.name() === 'daemon');
-    expect(daemonCmd).toBeDefined();
-
-    const subNames = daemonCmd!.commands.map((c) => c.name());
-    expect(subNames).toContain('start');
-    expect(subNames).toContain('stop');
-    expect(subNames).toContain('status');
+    expect(daemonCmd).toBeUndefined();
   });
 });

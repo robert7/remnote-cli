@@ -1,7 +1,7 @@
 /**
  * Integration test runner for RemNote CLI.
  *
- * Runs real CLI commands against a live daemon with a connected RemNote plugin.
+ * Runs real CLI commands against a live MCP server with a connected RemNote plugin.
  * Creates real content in RemNote — all prefixed with [CLI-TEST] for easy cleanup.
  *
  * Usage:
@@ -9,7 +9,7 @@
  *   npm run test:integration -- --yes # Skip confirmation prompt
  *
  * Environment variables:
- *   CLI_CONTROL_PORT — Daemon control port (default: 3100)
+ *   REMNOTE_MCP_URL  — MCP server URL (default: http://127.0.0.1:3001/mcp)
  *   CLI_TEST_DELAY   — Delay in ms after create before search (default: 2000)
  */
 
@@ -251,12 +251,12 @@ async function ensureIntegrationParentNote(
 
 async function main(): Promise<void> {
   const skipConfirm = process.argv.includes('--yes');
-  const controlPort = parseInt(process.env.CLI_CONTROL_PORT ?? '3100', 10);
+  const mcpUrl = process.env.REMNOTE_MCP_URL ?? 'http://127.0.0.1:3001/mcp';
   const runId = new Date().toISOString();
 
   printBanner();
 
-  console.log(`Control port: ${controlPort}`);
+  console.log(`MCP server: ${mcpUrl}`);
   console.log(`Run ID: ${runId}`);
   console.log('');
 
@@ -268,16 +268,18 @@ async function main(): Promise<void> {
     }
   }
 
-  const cli = new CliTestClient(controlPort);
+  const cli = new CliTestClient(mcpUrl);
   const results: WorkflowResult[] = [];
   const state: SharedState = {};
   const overallStart = Date.now();
 
-  // Preflight: integration tests require an already running daemon.
-  const daemonStatus = await cli.run(['daemon', 'status']);
-  if (daemonStatus.exitCode !== 0) {
-    console.error(`${RED}Daemon is not running on control port ${controlPort}.${RESET}`);
-    console.error(`Start it first, for example: ./run-daemon-in-foreground.sh`);
+  // Preflight: integration tests require an already running MCP server.
+  const statusResult = await cli.run(['status']);
+  if (statusResult.exitCode !== 0) {
+    console.error(`${RED}MCP server is not reachable at ${mcpUrl}.${RESET}`);
+    console.error(
+      `Start remnote-mcp-server first, for example: npm run dev in ../remnote-mcp-server`
+    );
     process.exit(1);
   }
 

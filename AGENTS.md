@@ -4,20 +4,21 @@ This file is a map for AI agents working in `remnote-cli`.
 
 ## Repo Role
 
-This repo is the CLI companion app for the RemNote bridge plugin. It uses a daemon model:
+This repo is the command-line client for the RemNote MCP stack:
 
 ```text
-CLI commands (short-lived) <-> HTTP control API (:3100) <-> daemon <-> WebSocket (:3002) <-> bridge plugin
+CLI commands (short-lived) <-> MCP HTTP (:3001/mcp) <-> remnote-mcp-server <-> WebSocket (:3002) <-> bridge plugin
 ```
 
-JSON output is the default mode for automation consumers.
+JSON output is the default mode for automation consumers. The CLI no longer runs a daemon; `remnote-mcp-server` is the
+single server component.
 
 ## Companion Repos (Sibling Dirs)
 
 Resolve from this repo root (`$(pwd)`):
 
 - `$(pwd)/../remnote-mcp-bridge` - authoritative bridge actions + payload/response contracts
-- `$(pwd)/../remnote-mcp-server` - sibling consumer with shared contract and compatibility logic
+- `$(pwd)/../remnote-mcp-server` - MCP server and bridge WebSocket host used by the CLI
 
 When bridge contracts change, validate all three repos.
 
@@ -25,14 +26,14 @@ When bridge contracts change, validate all three repos.
 
 ### External CLI Command Surface
 
-- Daemon lifecycle: `daemon start`, `daemon stop`, `daemon status`
-- Bridge commands: `create`, `search`, `search-tag`, `read`, `update`, `journal`, `status`
+- Bridge commands: `create`, `search`, `search-tag`, `read`, `update`, `journal`, `status`, `read-table`
+- Global MCP endpoint option: `--mcp-url <url>` (default: `http://127.0.0.1:3001/mcp`, env: `REMNOTE_MCP_URL`)
 
 ### Bridge Mapping and Compatibility
 
-- CLI bridge actions include `search_by_tag` and `get_status`.
-- Bridge plugin sends WebSocket `hello` with plugin version.
-- `status` output may include `cliVersion` and `version_warning`.
+- CLI command payloads map to MCP tools exposed by `remnote-mcp-server`.
+- MCP tools map to bridge actions such as `create_note`, `search`, `search_by_tag`, `read_note`, `update_note`,
+  `append_journal`, `get_status`, and `read_table`.
 - Projects are `0.x`; prefer same minor line across bridge/server/CLI.
   - See `../remnote-mcp-bridge/docs/guides/bridge-consumer-version-compatibility.md`.
 
@@ -40,17 +41,14 @@ When bridge contracts change, validate all three repos.
 
 - `src/cli.ts` - top-level command wiring and global options
 - `src/commands/*.ts` - command argument mapping and output handling
-- `src/daemon/daemon-server.ts` - daemon runtime composition
-- `src/daemon/control-server.ts` - control API (`/health`, `/execute`, `/shutdown`)
-- `src/websocket/websocket-server.ts` - bridge WS server + request lifecycle
-- `src/client/daemon-client.ts` - CLI-to-daemon HTTP client
-- `src/version-compat.ts` - compatibility warning logic
+- `src/client/mcp-server-client.ts` - CLI-to-MCP Streamable HTTP client
+- `src/client/command-client.ts` - command helper for constructing MCP clients
+- `src/output/formatter.ts` - JSON/text formatting
 
 Primary docs for deeper context:
 
 - `docs/architecture.md`
 - `docs/guides/command-reference.md`
-- `docs/guides/daemon-management.md`
 - `docs/guides/troubleshooting.md`
 
 ## Development and Verification
@@ -80,15 +78,13 @@ wrapper.
 
 - Default: do not run `npm run test:integration` or `./run-integration-test.sh` directly.
 - Allowed path for AI agents: `./run-agent-integration-test.sh [--yes]`
-- Before invoking the wrapper, the agent must ask the human collaborator to start the bridge in RemNote.
-- If bridge code changed after the currently running RemNote bridge session started, the agent must ask the human
-  collaborator to restart the bridge before rerunning the suite.
-- When switching from MCP server live integration tests to CLI live integration tests, the agent must ensure the MCP
-  server is stopped before starting the CLI daemon.
-- The wrapper may start the local CLI daemon if it is not already running, then waits for `daemon status` to report
-  `wsConnected === true` before launching the suite.
-- After each agent-assisted integration run, whether it passes, fails, or is interrupted, the agent must stop the CLI
-  daemon if and only if the wrapper started it for that run.
+- Before invoking the wrapper, ask the human collaborator to start the bridge in RemNote.
+- If bridge code changed after the currently running RemNote bridge session started, ask the human collaborator to
+  restart the bridge before rerunning the suite.
+- The wrapper may start `../remnote-mcp-server` if it is not already reachable, then waits for `remnote-cli status` to
+  report a connected bridge before launching the suite.
+- After each agent-assisted integration run, whether it passes, fails, or is interrupted, the wrapper must stop the MCP
+  server if and only if the wrapper started it for that run.
 - If the bridge never connects, the wrapper must stop and tell the human collaborator to verify the RemNote bridge
   session.
 - Use unit/static checks for routine agent-side verification when explicit live validation is not requested.

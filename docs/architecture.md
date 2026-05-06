@@ -1,54 +1,47 @@
 # Architecture
 
-## Why a Daemon?
+`remnote-cli` is a short-lived MCP client. MCP, the Model Context Protocol, is the tool-call protocol exposed by
+`remnote-mcp-server` over HTTP.
 
-The RemNote Automation Bridge plugin is a WebSocket **client** — it connects to a server at `ws://127.0.0.1:3002`. In the MCP
-integration path, the MCP server hosts that WebSocket server. For the CLI path, the CLI itself must host it.
-
-Running a WebSocket server in every short-lived CLI command would be impractical: the bridge would need to reconnect
-for each command. Instead, a long-running daemon process hosts both the WebSocket server and an HTTP control API.
-CLI commands are short-lived HTTP clients that dispatch requests to the daemon.
-
-This keeps both integration paths at exactly two components:
-
-- **MCP path:** Bridge Plugin + MCP Server
-- **CLI path:** Bridge Plugin + CLI Daemon
-
-## IPC: Why HTTP?
-
-The daemon exposes `http://127.0.0.1:3100` for CLI→daemon communication.
-
-- **Cross-platform:** Works identically on macOS, Linux, and Windows. Unix sockets require platform-specific paths.
-- **Debuggable:** `curl http://127.0.0.1:3100/health` works out of the box.
-- **Zero dependencies:** Node 20.19+ includes `fetch()` and `node:http`. No IPC libraries needed.
-- **Familiar:** HTTP request/response semantics map directly to command/result.
-
-## Process Model
-
-```
-daemon start (foreground=false)
-  └─ spawn detached child: node dist/index.js daemon start --foreground
-       ├─ WebSocket Server on :3002
-       ├─ HTTP Control Server on :3100
-       └─ PID file at ~/.remnote-cli/daemon.pid
+```text
+remnote-cli
+  -> HTTP MCP endpoint http://127.0.0.1:3001/mcp
+  -> remnote-mcp-server
+  -> WebSocket ws://127.0.0.1:3002
+  -> RemNote Automation Bridge plugin
+  -> RemNote SDK
 ```
 
-The parent process spawns a detached child, waits for `/health` to return 200, then exits. The child writes a PID
-file containing `{ pid, wsPort, controlPort, startedAt }`. CLI commands read this file to discover the control port.
+## Why No CLI Daemon?
 
-## Control API Endpoints
+The RemNote bridge plugin can connect to only one local WebSocket server at a time. Keeping a separate CLI daemon meant
+the CLI and MCP server competed for port `3002`, duplicated integration tests, and forced shared bridge-contract changes
+to be implemented twice.
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| `POST` | `/execute` | Forward `{ action, payload }` to bridge via WebSocket |
-| `GET` | `/health` | Return daemon status, PID, uptime, bridge connection state |
-| `POST` | `/shutdown` | Initiate graceful shutdown |
+The CLI now reuses `remnote-mcp-server` as the only server component. This gives local scripts and MCP clients the same
+bridge connection, compatibility checks, and RemNote action surface.
+
+## CLI Process Model
+
+Each command starts, opens an MCP session against `--mcp-url`, calls one MCP tool, formats the result, then exits.
+Default JSON output is preserved for automation. Use `--text` when reading output directly.
+
+## Configuration
+
+The default MCP URL is `http://127.0.0.1:3001/mcp`.
+
+Override it with:
+
+```bash
+remnote-cli --mcp-url http://127.0.0.1:3005/mcp status
+REMNOTE_MCP_URL=http://127.0.0.1:3005/mcp remnote-cli status
+```
 
 ## Exit Codes
 
 | Code | Meaning |
 |------|---------|
 | 0 | Success |
-| 1 | General error |
-| 2 | Daemon not running |
-| 3 | Bridge not connected |
+| 1 | General command or tool error |
+| 2 | MCP server not reachable |
+| 3 | Reserved for bridge-not-connected flows |

@@ -52,8 +52,8 @@ skill customization when needed.
      `https://github.com/robert7/remnote-mcp-bridge/blob/main/docs/guides/development-run-plugin-locally.md`
 3. `remnote-cli` is installed on the same machine where OpenClaw runs.
    - Preferred install: `npm install -g remnote-cli`
-4. RemNote is open in browser/app (`https://www.remnote.com/`).
-5. `remnote-cli` daemon is running (`remnote-cli daemon start`).
+4. `remnote-mcp-server` is running or reachable by `REMNOTE_MCP_URL`.
+5. RemNote is open in browser/app (`https://www.remnote.com/`).
 6. The right-sidebar `MCP` panel is available for status inspection and manual reconnect when needed, but it is not
    required to already be open before commands work.
 
@@ -61,7 +61,7 @@ If any precondition is missing, stop and fix setup first.
 
 ## Read-First Safety Policy
 
-- Default to read-only flows: `status`, `search`, `search-tag`, `read`, `daemon status`.
+- Default to read-only flows: `status`, `search`, `search-tag`, `read`.
 - Do not run mutating commands by default.
 - For writes (`create`, `update`, `journal`), require the exact phrase `confirm write` from the user in the same turn.
 - If `confirm write` is not present, ask for confirmation and do not execute writes.
@@ -71,8 +71,7 @@ If any precondition is missing, stop and fix setup first.
 - Run exactly one `remnote-cli` command per execution.
 - Invoke `remnote-cli` directly; do not chain shell commands.
 - Do not use `&&`, `|`, `;`, subshells (`(...)`), command substitution (`$()`), `xargs`, or `echo` pipelines.
-- WRONG: `remnote-cli daemon status --text && echo '---' && remnote-cli status --text`
-- RIGHT: `remnote-cli daemon status --text`
+- WRONG: `remnote-cli status --text && echo '---' && remnote-cli search "topic"`
 - RIGHT: `remnote-cli status --text`
 - Reason: command chaining can trigger exec approvals and break automation flow.
 
@@ -88,15 +87,14 @@ If any precondition is missing, stop and fix setup first.
 
 ## Compatibility Check (mandatory before real work)
 
-1. Check daemon and bridge connectivity:
-   - `remnote-cli daemon status --text`
+1. Check MCP server and bridge connectivity:
    - `remnote-cli status --text`
 2. Read versions from `remnote-cli status --text`:
    - active plugin version
    - CLI version
    - `version_warning` (if present)
    - write-policy flags: `acceptWriteOperations`, `acceptReplaceOperation`
-3. RemNote-open-first / daemon-starts-later is supported:
+3. RemNote-open-first / server-starts-later is supported:
    - the bridge should retry in the background
    - the sidebar panel is optional and mainly useful for monitoring, manual reconnect, and wake-up triggers
 4. Enforce version rule: bridge plugin and `remnote-cli` must be the same `0.x` minor line (prefer exact match).
@@ -106,19 +104,15 @@ If any precondition is missing, stop and fix setup first.
      - Or same minor line (`0.<minor>.x`) when exact is unavailable.
    - Re-run:
      - `remnote-cli --version`
-     - `remnote-cli daemon restart` is not available, so run:
-       - `remnote-cli daemon stop`
-       - `remnote-cli daemon start`
+     - `remnote-mcp-server --version`
      - `remnote-cli status --text`
 
 ## Core Commands
 
 ### Health and Connectivity
 
-- `remnote-cli daemon start`
-- `remnote-cli daemon status --text`
 - `remnote-cli status --text`
-- `remnote-cli --control-port 3110 status --text` for non-default daemon control ports
+- `remnote-cli --mcp-url http://127.0.0.1:3005/mcp status --text` for non-default MCP server URLs
 
 ### Read-Only Operations (default)
 
@@ -131,7 +125,7 @@ If any precondition is missing, stop and fix setup first.
 
 - Use JSON output (default) for navigation, multi-step retrieval, and any flow that needs IDs for follow-up reads.
 - Use `--text` only for plain human summarization of exactly one note when no further navigation is needed.
-- Exit code `2` means the daemon is unreachable or not running.
+- Exit code `2` means the MCP server is unreachable or not running.
 - For structure traversal, start with shallow reads and high child limit:
   - `remnote-cli read <rem-id> --depth 1 --child-limit 500`
 - Increase `--depth`, `--child-limit`, or `--max-content-length` only when the user actually needs more hierarchy or
@@ -177,15 +171,12 @@ this sequence in order:
 
 1. Check bridge status first:
    - `remnote-cli status --text`
-2. If `status --text` fails with exit code `2` or says the daemon is unreachable:
-   - run `remnote-cli daemon status --text`
-   - if the daemon is not running, run `remnote-cli daemon start`
+2. If `status --text` fails with exit code `2` or says the MCP server is unreachable:
+   - start `remnote-mcp-server`
    - re-run `remnote-cli status --text`
 3. If `status --text` shows `version_warning`:
    - align the CLI version to the plugin `0.x` minor line
-   - restart with separate commands because `daemon restart` does not exist:
-     - `remnote-cli daemon stop`
-     - `remnote-cli daemon start`
+   - restart `remnote-mcp-server`
    - re-run `remnote-cli status --text`
 4. If the bridge is disconnected:
    - use the browser tool to ensure `https://www.remnote.com/` is open and reachable

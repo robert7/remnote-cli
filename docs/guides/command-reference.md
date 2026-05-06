@@ -8,25 +8,25 @@
 remnote-cli [global-options] <command> [command-options]
 ```
 
-Most commands require a running daemon:
+Most commands require a running `remnote-mcp-server`:
 
 ```bash
-remnote-cli daemon start
+remnote-mcp-server
 ```
 
 Bridge actions (`create`, `search`, `search-tag`, `read`, `update`, `journal`, `status`) also require RemNote with
-the RemNote Automation Bridge plugin connected to the daemon.
+the RemNote Automation Bridge plugin connected to that MCP server.
 
 ## Global Options
 
-| Flag                    | Default | Description                                  |
-| ----------------------- | ------- | -------------------------------------------- |
-| `--json`                | enabled | JSON output mode                             |
-| `--text`                | off     | Human-readable output mode                   |
-| `--control-port <port>` | `3100`  | Control API port used by non-daemon commands |
-| `--verbose`             | off     | Reserved for verbose stderr logging          |
-| `--version`             | n/a     | Show CLI version                             |
-| `--help`                | n/a     | Show help                                    |
+| Flag              | Default                         | Description                         |
+| ----------------- | ------------------------------- | ----------------------------------- |
+| `--json`          | enabled                         | JSON output mode                    |
+| `--text`          | off                             | Human-readable output mode          |
+| `--mcp-url <url>` | `http://127.0.0.1:3001/mcp`     | MCP server URL                      |
+| `--verbose`       | off                             | Reserved for verbose stderr logging |
+| `--version`       | n/a                             | Show CLI version                    |
+| `--help`          | n/a                             | Show help                           |
 
 ### Output mode rules
 
@@ -49,86 +49,8 @@ To prevent this:
 | ---- | --------------------------------------- |
 | `0`  | Success                                 |
 | `1`  | Generic command/action error            |
-| `2`  | Daemon not running / unreachable        |
+| `2`  | MCP server not running / unreachable    |
 | `3`  | Reserved for bridge-not-connected flows |
-
-## daemon
-
-Manage daemon lifecycle.
-
-```bash
-remnote-cli daemon <start|stop|status> [options]
-```
-
-### daemon start
-
-Start the daemon in background mode (default) or foreground mode.
-
-```bash
-remnote-cli daemon start [options]
-```
-
-| Option                  | Default  | Description                                        |
-| ----------------------- | -------- | -------------------------------------------------- |
-| `--ws-port <port>`      | `3002`   | WebSocket server port for bridge plugin connection |
-| `--control-port <port>` | `3100`   | HTTP control API port for CLI commands             |
-| `-f, --foreground`      | `false`  | Run in current process (no detach)                 |
-| `--log-level <level>`   | `silent` | One of `silent`, `debug`, `info`, `warn`, `error`  |
-| `--log-file <path>`     | auto     | Log destination file                               |
-
-Behavior rules:
-
-- Background mode detaches and returns after health check passes; default log file is `~/.remnote-cli/daemon.log`
-  unless overridden.
-- Foreground mode blocks in the current terminal, has no default log file, and upgrades default `--log-level` from
-  `silent` to `info`.
-
-Examples:
-
-```bash
-remnote-cli daemon start
-remnote-cli daemon start --foreground --log-level debug --log-file ~/.remnote-cli/custom.log
-```
-
-### daemon stop
-
-Stop a running daemon.
-
-```bash
-remnote-cli daemon stop
-```
-
-Behavior rules:
-
-- Returns exit code `2` if no running daemon is found.
-- Attempts graceful shutdown first, then falls back to process termination if needed.
-
-Examples:
-
-```bash
-remnote-cli daemon stop
-remnote-cli --text daemon stop
-```
-
-### daemon status
-
-Show daemon process health.
-
-```bash
-remnote-cli daemon status
-```
-
-Behavior rules:
-
-- Returns health fields including PID, uptime, ports, and `wsConnected`.
-- Returns exit code `2` when daemon is not running.
-
-Examples:
-
-```bash
-remnote-cli daemon status
-remnote-cli --text daemon status
-```
 
 ## create
 
@@ -383,7 +305,7 @@ remnote-cli status
 
 Behavior rules:
 
-- Calls daemon `get_status` and reports bridge connectivity.
+- Calls the MCP server `remnote_status` tool and reports bridge connectivity.
 - JSON output includes bridge write-policy flags when available:
   - `acceptWriteOperations`
   - `acceptReplaceOperation`
@@ -392,11 +314,11 @@ Behavior rules:
   - plugin version when provided
   - CLI version when provided
   - compatibility warning (`version_warning`) when provided
-- Returns exit code `2` when daemon is unreachable.
+- Returns exit code `2` when the MCP server is unreachable.
 
 Examples:
 
 ```bash
 remnote-cli status
-remnote-cli --control-port 3110 status --text
+remnote-cli --mcp-url http://127.0.0.1:3005/mcp status --text
 ```

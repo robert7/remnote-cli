@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Changed `remnote-cli` to connect directly to `remnote-mcp-server` over MCP Streamable HTTP.
+- Replaced `--control-port` with `--mcp-url` and `REMNOTE_MCP_URL`.
+- Updated integration wrappers to reuse or start `remnote-mcp-server` instead of managing a CLI daemon.
+
+### Removed
+
+- Removed the CLI daemon, daemon lifecycle commands, daemon HTTP control API, daemon WebSocket server, PID/log
+  management, and daemon-specific documentation.
+
 ## [0.13.1] - 2026-05-06
 
 ### Changed
