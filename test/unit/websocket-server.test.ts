@@ -1,6 +1,7 @@
-import { describe, expect, it, afterEach, beforeEach } from 'vitest';
+import { describe, expect, it, afterEach, beforeEach, vi } from 'vitest';
 import { WebSocket } from 'ws';
 import { WebSocketServer } from '../../src/websocket/websocket-server.js';
+import { REQUEST_TIMEOUT_MS } from '../../src/config.js';
 import pino from 'pino';
 
 const TEST_HOST = '127.0.0.1';
@@ -201,20 +202,24 @@ describe('WebSocketServer', () => {
   });
 
   it('handles request timeout', async () => {
-    // Use a server with very short timeout to avoid fake timer issues
     await server.stop();
     server = new WebSocketServer(0, TEST_HOST, createSilentLogger());
 
-    // Temporarily patch REQUEST_TIMEOUT_MS by testing behavior directly
     await server.start();
     client = await connectClient(server.getPort());
     await new Promise((r) => setTimeout(r, 50));
 
-    // Send request but don't respond — will timeout after REQUEST_TIMEOUT_MS (5s)
-    const resultPromise = server.sendRequest('slow_action', {});
+    vi.useFakeTimers();
+    try {
+      const resultPromise = server.sendRequest('slow_action', {});
+      const expectation = expect(resultPromise).rejects.toThrow('timeout');
 
-    await expect(resultPromise).rejects.toThrow('timeout');
-  }, 10000);
+      await vi.advanceTimersByTimeAsync(REQUEST_TIMEOUT_MS);
+      await expectation;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
   it('responds to ping with pong', async () => {
     await server.start();

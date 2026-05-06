@@ -10,7 +10,7 @@ export const PID_FILE = join(PID_DIR, 'daemon.pid');
 export const LOG_FILE = join(PID_DIR, 'daemon.log');
 export const DATA_DIR = PID_DIR;
 
-export const REQUEST_TIMEOUT_MS = 5000;
+export const REQUEST_TIMEOUT_MS = 15000;
 export const SHUTDOWN_TIMEOUT_MS = 3000;
 
 /** Exit codes for CLI process */

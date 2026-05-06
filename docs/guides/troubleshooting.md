@@ -91,7 +91,7 @@ rm ~/.remnote-cli/daemon.pid
 
 ## Command Timeouts
 
-**Symptom:** Commands hang for 5+ seconds then fail with "Request timeout"
+**Symptom:** Commands hang for 15+ seconds then fail with "Request timeout"
 
 **Cause:** The bridge plugin received the request but didn't respond in time. This can happen if RemNote is
 busy or the plugin encountered an error. Check RemNote's developer console for plugin errors.

@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Increased the RemNote bridge request timeout from 5 seconds to 15 seconds.
 - Reduced Dependabot version-update checks to monthly runs on the 15th.
 
 ## [0.13.0] - 2026-04-24
