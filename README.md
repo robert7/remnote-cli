@@ -1,6 +1,11 @@
 # remnote-cli has moved
 
-This repository is **legacy and discontinued**, but the `remnote-cli` command is still available and maintained.
+This repository is **legacy and discontinued**, but the `remnote-cli` command is still available and maintained in
+`remnote-mcp-server`.
+
+`remnote-cli@0.13.1` was the last independent CLI package. `remnote-cli@0.14.0` is only a migration shim: it prints
+the migration instructions and exits with a non-zero status so old automation does not keep using the discontinued
+package silently.
 
 The CLI source code, documentation, tests, and npm executable now live in the
 [remnote-mcp-server](https://github.com/robert7/remnote-mcp-server) repository. The `remnote-mcp-server` npm package
@@ -33,6 +38,9 @@ Verify both executables are available:
 remnote-mcp-server --version
 remnote-cli --version
 ```
+
+If `remnote-cli` still prints the migration notice after installation, the old standalone package is still earlier in
+your shell `PATH`; remove that installation and reopen the shell.
 
 ## Where to go now
 

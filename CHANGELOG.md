@@ -4,10 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [0.14.0] - 2026-05-07
+
+### Added
+
+- Added a final `remnote-cli` migration shim that prints package move instructions and exits with status code `1`.
+
 ### Changed
 
-- Marked this repository as legacy. The maintained `remnote-cli` executable now lives in the
+- Marked this repository and npm package as legacy. The maintained `remnote-cli` executable now lives in the
   `remnote-mcp-server` package.
+- Updated README guidance to explain that `remnote-cli@0.13.1` was the last independent CLI release and
+  `remnote-cli@0.14.0` is only a migration shim.
+
+### Removed
+
+- Removed the old standalone CLI implementation artifacts, scripts, skills, and stale documentation from this
+  repository. Use `remnote-mcp-server` for all maintained CLI development.
+- Removed legacy CI, Dependabot, pull request template, and Prettier configuration from this discontinued repository.
+
+## [0.13.1] - 2026-05-06
+
+### Changed
+
 - Preserved `docs/demo.md` as a forwarding page because it is externally linked.
 - Changed `remnote-cli` to connect directly to `remnote-mcp-server` over MCP Streamable HTTP.
 - Replaced `--control-port` with `--mcp-url` and `REMNOTE_MCP_URL`.
@@ -16,8 +37,6 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-- Removed the old standalone CLI source, tests, scripts, package metadata, skills, and stale documentation from this
-  repository. Use `remnote-mcp-server` for all maintained CLI development.
 - Removed the CLI daemon, daemon lifecycle commands, daemon HTTP control API, daemon WebSocket server, PID/log
   management, and daemon-specific documentation.
 

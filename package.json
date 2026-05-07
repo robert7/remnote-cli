@@ -1,0 +1,38 @@
+{
+  "name": "remnote-cli",
+  "version": "0.14.0",
+  "description": "Legacy migration shim for remnote-cli. The maintained CLI now lives in remnote-mcp-server.",
+  "type": "module",
+  "bin": {
+    "remnote-cli": "./index.js"
+  },
+  "scripts": {
+    "test": "node test/shim.test.mjs"
+  },
+  "keywords": [
+    "remnote",
+    "cli",
+    "mcp",
+    "migration"
+  ],
+  "author": "nightingale7 <nightingale7@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "docs/demo.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robert7/remnote-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/robert7/remnote-cli/issues"
+  },
+  "homepage": "https://github.com/robert7/remnote-cli#readme",
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
